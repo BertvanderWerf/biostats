@@ -110,7 +110,7 @@ splitMatrix <- function(mat, rows=2, cols=2, transpose=FALSE) {
           col_j <- rbind(col_j, c_j[[i]])
         }
       }
-      col_j <- splitmatrix(col_j, rows=rows, cols=1, transpose=FALSE)
+      col_j <- splitMatrix(col_j, rows=rows, cols=1, transpose=FALSE)
       col[[j]] <- col_j
     }
     out <- matrix(list(), nlevels(rows), nlevels(cols))
@@ -124,7 +124,7 @@ splitMatrix <- function(mat, rows=2, cols=2, transpose=FALSE) {
         }
         #col[[i]][[j]] <- list() # clean up memory
       }
-      out[j,] <- splitmatrix(row_j, rows=1, cols=cols, transpose=transpose)
+      out[j,] <- splitMatrix(row_j, rows=1, cols=cols, transpose=transpose)
     }
   }
 
@@ -138,6 +138,7 @@ is.splitMatrix <- function(mat) {
   "splitMatrix" %in% class(mat)
 }
 
+#' @param ... Additional arguments passed to the function controlling the conversion process.
 #' @rdname splitMatrix
 #' @export
 as.splitMatrix <- function(mat, ...) {
