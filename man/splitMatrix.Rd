@@ -13,21 +13,35 @@ is.splitMatrix(mat)
 as.splitMatrix(mat, ...)
 }
 \arguments{
-\item{mat}{A matrix to split or a splitMatrix to re-split}
+\item{mat}{A matrix to split or a splitMatrix to re-split or a structure what can be coerced into a matrix}
 
-\item{rows}{A factor with length equal to the number of rows of the input matrix. If a single number is provided, it indicates the number of rows the matrix should be split.}
+\item{rows}{A factor indicating how to (re)split \code{mat} into row matrices, or a single number indicating the number of row matrices \code{mat} should be split.}
 
-\item{cols}{A factor with length equal to the number of columns of the input matrix. If a single number is provided, it indicates the number of columns the matrix should be split.}
+\item{cols}{A factor indicating how to (re)split \code{mat} into column matrices, or a single number indicating the number of column matrices \code{mat} should be split.}
 
 \item{transpose}{creates the sub matrices transpose}
 
 \item{...}{Additional arguments passed to the function controlling the conversion process.}
 }
-\value{
-a splitMatrix containing a matrix of matrices
-}
 \description{
-Splits a matrix or splitMatrix into a matrix of matrices along rows or columns based on a number or factor.
+splitMatrix splits a matrix or a splitMatrix into a matrix of matrices along rows or columns based on a number or factor.
+as.splitMatrix attempts to turn its argument into a matrix
+is.splitMatrix tests if its argument is a splitMatrix
+}
+\details{
+If \code{rows} is a factor, it should have the length equal to \code{nrow(mat)} if \code{mat} is a matrix or equal to \code{sum(sapply(mat[,1], nrow))} if \code{mat} is a \code{splitMatrix}. if \code{rows} is a number, the value should be > 1 and <= \code{nrow(mat)} in case of a pure matrix or <= \code{sum(sapply(mat[,1], nrow))} if \code{mat} is a \code{splitMatrix}.
+
+If \code{cols} is a factor, it should have the length equal to \code{ncol(mat)} if \code{mat} is a matrix or equal to \code{sum(sapply(mat[1,], nrow))} if \code{mat} is a \code{splitMatrix}. if \code{cols} is a number, the value should be > 1 and <= \code{nrow(mat)} in case of a pure matrix or <= \code{sum(sapply(mat[,1], nrow))} if \code{mat} is a \code{splitMatrix}.
+
+If \code{transpose} is TRUE, then the result each sub-matrix is a transpose
+
+\code{splitMatrix} returns a matrix of matrices where \code{sapply(mat[i,], function(x) { dim(x)[2]})} are equal for all \code{i} and \code{sapply(mat[,j], function(x) { dim(x)[1]} )} are equal for all \code{j}
+
+\code{is.splitMatrix} returns TRUE if the argument is a \code{splitMatrix}, else it returns FALSE
+
+'as.splitMatrix' tries to coerce the argument in a \code{splitMatrix}. The method and additional arguments are derived from \code{splitMatrix}
+
+The \code{print} method, prints the individual dimensions as \verb{name: (row x col)} in a rectangular form.
 }
 \examples{
 mat <- matrix(runif(100), 10, 10)

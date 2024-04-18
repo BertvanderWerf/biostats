@@ -6,7 +6,9 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of biostats is to …
+The goal of biostats is to streamline statistical analysis from a higher
+abstraction level, particularly focussed on making my life as a
+biostatistician easier.
 
 ## Installation
 

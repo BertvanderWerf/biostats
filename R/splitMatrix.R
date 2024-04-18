@@ -1,16 +1,33 @@
 
 #' splitMatrices
 #'
-#' Splits a matrix or splitMatrix into a matrix of matrices along rows or columns based on a number or factor.
+#' splitMatrix splits a matrix or a splitMatrix into a matrix of matrices along rows or columns based on a number or factor.
+#' as.splitMatrix attempts to turn its argument into a matrix
+#' is.splitMatrix tests if its argument is a splitMatrix
 #'
-#' @param mat A matrix to split or a splitMatrix to re-split
-#' @param rows A factor with length equal to the number of rows of the input matrix. If a single number is provided, it indicates the number of rows the matrix should be split.
-#' @param cols A factor with length equal to the number of columns of the input matrix. If a single number is provided, it indicates the number of columns the matrix should be split.
+#' @param mat A matrix to split or a splitMatrix to re-split or a structure what can be coerced into a matrix
+#' @param rows A factor indicating how to (re)split `mat` into row matrices, or a single number indicating the number of row matrices `mat` should be split.
+#' @param cols A factor indicating how to (re)split `mat` into column matrices, or a single number indicating the number of column matrices `mat` should be split.
 #' @param transpose creates the sub matrices transpose
 #'
-#' @return a splitMatrix containing a matrix of matrices
-#' @export
+#' @details
+#' If `rows` is a factor, it should have the length equal to `nrow(mat)` if `mat` is a matrix or equal to `sum(sapply(mat[,1], nrow))` if `mat` is a `splitMatrix`. if `rows` is a number, the value should be > 1 and <= `nrow(mat)` in case of a pure matrix or <= `sum(sapply(mat[,1], nrow))` if `mat` is a `splitMatrix`.
 #'
+#' If `cols` is a factor, it should have the length equal to `ncol(mat)` if `mat` is a matrix or equal to `sum(sapply(mat[1,], nrow))` if `mat` is a `splitMatrix`. if `cols` is a number, the value should be > 1 and <= `nrow(mat)` in case of a pure matrix or <= `sum(sapply(mat[,1], nrow))` if `mat` is a `splitMatrix`.
+#'
+#' If `transpose` is TRUE, then the result each sub-matrix is a transpose
+#'
+#' `splitMatrix` returns a matrix of matrices where `sapply(mat[i,], function(x) { dim(x)[2]})` are equal for all `i` and `sapply(mat[,j], function(x) { dim(x)[1]} )` are equal for all `j`
+#'
+#' `is.splitMatrix` returns TRUE if the argument is a `splitMatrix`, else it returns FALSE
+#'
+#' 'as.splitMatrix' tries to coerce the argument in a `splitMatrix`. The method and additional arguments are derived from `splitMatrix`
+#'
+#' The `print` method, prints the individual dimensions as `name: (row x col)` in a rectangular form.
+#'
+#'
+#'
+#' @export
 #' @examples
 #' mat <- matrix(runif(100), 10, 10)
 #' splitted.mat <- splitMatrix(mat, 2,2)
@@ -67,6 +84,7 @@ splitMatrix <- function(mat, rows=2, cols=2, transpose=FALSE) {
       }
       names(out) <- outer(levels(rows), levels(cols), paste.dot)    }
   } else {
+    class(mat) <- class(mat)[class(mat) != 'splitMatrix'] # to prevent executing possible overloaded functions
     dim <- base::dim(mat)
     for (j in 1:dim[2]) {
       d_j <- dim(mat[1,j][[1]])[2]
@@ -128,7 +146,7 @@ splitMatrix <- function(mat, rows=2, cols=2, transpose=FALSE) {
     }
   }
 
-  class(out) <- c(class(out), 'splitMatrix')
+  class(out) <- c('splitMatrix', class(out))
   return(out)
 }
 
@@ -145,3 +163,22 @@ as.splitMatrix <- function(mat, ...) {
   splitMatrix(mat, ...)
 }
 
+#' @export
+as.matrix.splitMatrix <- function(x, ...) {
+  x <- splitMatrix(x, 1, 1)[[1]]
+  as.matrix(x, ...)
+}
+
+#' @export
+as.data.frame.splitMatrix <- function(x, ...) {
+  as.data.frame(as.matrix(x), ...)
+}
+
+#' @export
+print.splitMatrix <- function(x, ...) {
+  out <- sapply(x, function(y) paste0("(",paste(base::dim(y), collapse=" x "),")"))
+  out <- paste(names(x), out, sep=": ")
+  out <- matrix(out, base::dim(x)[1], base::dim(x)[2],
+                dimnames=list(row.names(x), colnames(x)))
+  print.default(out, ...)
+}
