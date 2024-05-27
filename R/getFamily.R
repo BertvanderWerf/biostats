@@ -17,3 +17,9 @@ getFamily <- function(fit) {
 getFamily.default <- function(fit) {
   return(fit$family$family)
 }
+
+#' @export
+getFamily.glmerMod <- function(fit) {
+  f <- family(fit)
+  f$family
+}

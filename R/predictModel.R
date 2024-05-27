@@ -16,12 +16,12 @@ predictModel <- function(fit, predictors, weights=NULL, df=NULL) {
 
   formula <- extractFixedFormula(formula(fit))
   names <- getFixedVars(fit)
-  c <- getCoefficients(fit)
+  c <- biostats::getCoefficients(fit)
   x <- model.matrix(formula, data=predictors)
   stopifnot(all(colnames(x)==row.names(c)))
 
   cond <- (row.names(predictors) %in% row.names(x))
-  preds <- x %*% as.matrix(c$Estimates)
+  preds <- x %*% as.matrix(c$Estimate)
 
   vcov <- as.matrix(vcov(fit))
 
@@ -43,7 +43,7 @@ predictModel <- function(fit, predictors, weights=NULL, df=NULL) {
     pred$lower.95 <- pred$estimate - qt(0.975, df) * sqrt(pred$variance)
     pred$upper.95 <- pred$estimate + qt(0.975, df) * sqrt(pred$variance)
   }
-  L <- list(estimates=pred, vcov=vcov.pred, groupby=groupby, df=df)
+  L <- list(estimates=pred, vcov=vcov.pred, df=df)
 
   L$link <- getLink(fit)
   L$family <- getFamily(fit)

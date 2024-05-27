@@ -16,3 +16,9 @@ getLink <- function(fit) {
 getLink.default <- function(fit) {
   fit$family$link
 }
+
+#' @export
+getLink.glmerMod <- function(fit) {
+  f <- family(fit)
+  f$link
+}
