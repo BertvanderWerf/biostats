@@ -15,7 +15,7 @@
 #'
 #' If `cols` is a factor, it should have the length equal to `ncol(mat)` if `mat` is a matrix or equal to `sum(sapply(mat[1,], nrow))` if `mat` is a `splitMatrix`. if `cols` is a number, the value should be > 1 and <= `nrow(mat)` in case of a pure matrix or <= `sum(sapply(mat[,1], nrow))` if `mat` is a `splitMatrix`.
 #'
-#' If `transpose` is TRUE, then the result each sub-matrix is a transpose
+#' If `transpose` is TRUE, then the matrix is first transposed before it is split
 #'
 #' `splitMatrix` returns a matrix of matrices where `sapply(mat[i,], function(x) { dim(x)[2]})` are equal for all `i` and `sapply(mat[,j], function(x) { dim(x)[1]} )` are equal for all `j`
 #'
@@ -25,7 +25,7 @@
 #'
 #' The `print` method, prints the individual dimensions as `name: (row x col)` in a rectangular form.
 #'
-#'
+#' `as.matrix` and `as.data.frame` will will restore the original data matrix
 #'
 #' @export
 #' @examples
@@ -181,4 +181,56 @@ print.splitMatrix <- function(x, ...) {
   out <- matrix(out, base::dim(x)[1], base::dim(x)[2],
                 dimnames=list(row.names(x), colnames(x)))
   print.default(out, ...)
+}
+
+#' @export
+`[.splitMatrix` <- function(x, i, j, ...) {
+  class(x) <- class(x)[class(x)!='splitMatrix']
+  z <- x[i,j, ..., drop=FALSE]
+  if (length(z)>1) {
+    class(z) <- c('splitMatrix', class(z))
+  } else {
+    z <- z[[1]]
+  }
+  return(z)
+}
+
+#' @export
+`[<-.splitMatrix` <- function(x, i=NULL, j=NULL, value, ...) {
+  class(x) <- class(x)[class(x)!='splitMatrix']
+  if (is.null(i)) i <- seq(1,dim(x)[1])
+  if (is.null(j)) j <- seq(1,dim(x)[2])
+  n <- length(x[i,j,..., drop=FALSE])
+  if (!is.splitMatrix(value)) {
+    if (n==1) {
+      x[i,j,...][[1]] <-value
+    } else {
+      for (ii in i) for (jj in j) x[ii,jj][[1]] <- value
+    }
+  } else {
+    d <- dim(x[i,j,..., drop=FALSE])
+    d1 <- dim(value)
+    stopifnot(all(d==d1))
+    for (k in 1:length(i)) {
+      for (l in 1:length(j)) {
+        x[i[k], j[l]][[1]] <- value[k,l]
+      }
+    }
+  }
+  class(x) <- c('splitMatrix', class(x))
+  x
+}
+
+#' @export
+t.splitMatrix <- function(x) {
+  d <- dim(x)
+  for (i in 1:d[1]) {
+    for (j in 1:d[2]) {
+      x[i,j] <- t(x[i,j])
+    }
+  }
+  class(x) <- class(x)[class(x)!='splitMatrix']
+  x <- t(x)
+  class(x) <- c('splitMatrix', class(x))
+  x
 }

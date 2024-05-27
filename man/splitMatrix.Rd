@@ -33,7 +33,7 @@ If \code{rows} is a factor, it should have the length equal to \code{nrow(mat)} 
 
 If \code{cols} is a factor, it should have the length equal to \code{ncol(mat)} if \code{mat} is a matrix or equal to \code{sum(sapply(mat[1,], nrow))} if \code{mat} is a \code{splitMatrix}. if \code{cols} is a number, the value should be > 1 and <= \code{nrow(mat)} in case of a pure matrix or <= \code{sum(sapply(mat[,1], nrow))} if \code{mat} is a \code{splitMatrix}.
 
-If \code{transpose} is TRUE, then the result each sub-matrix is a transpose
+If \code{transpose} is TRUE, then the matrix is first transposed before it is split
 
 \code{splitMatrix} returns a matrix of matrices where \code{sapply(mat[i,], function(x) { dim(x)[2]})} are equal for all \code{i} and \code{sapply(mat[,j], function(x) { dim(x)[1]} )} are equal for all \code{j}
 
@@ -42,6 +42,8 @@ If \code{transpose} is TRUE, then the result each sub-matrix is a transpose
 'as.splitMatrix' tries to coerce the argument in a \code{splitMatrix}. The method and additional arguments are derived from \code{splitMatrix}
 
 The \code{print} method, prints the individual dimensions as \verb{name: (row x col)} in a rectangular form.
+
+\code{as.matrix} and \code{as.data.frame} will will restore the original data matrix
 }
 \examples{
 mat <- matrix(runif(100), 10, 10)
