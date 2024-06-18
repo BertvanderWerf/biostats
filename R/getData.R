@@ -15,12 +15,10 @@ getData <- function(fit) {
 
 #' @export
 getData.default <- function(fit) {
-  return(lme4::getData(fit))
-}
-
-#' @export
-getData.glm <- function(fit) {
-  return(fit$data)
+  if ('data' %in% names(fit)) {
+    return(fit$data)
+  }
+  stop("No 'data' variable can be found in the fitted list for class(",class(fit),"), please add data to the fitted object (see class glm)")
 }
 
 #' @export

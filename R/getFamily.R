@@ -23,3 +23,10 @@ getFamily.glmerMod <- function(fit) {
   f <- family(fit)
   f$family
 }
+
+#' @export
+getFamily.coxph <- function(fit) {
+  'coxph'
+}
+
+

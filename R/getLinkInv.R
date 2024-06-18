@@ -1,4 +1,4 @@
-#' getLink
+#' getLinkInv
 #'
 #' @param fit a fitted model
 #'
@@ -7,23 +7,23 @@
 #'
 #' @examples
 #' fit <- glm(count ~ gender, family=poisson, data=data)
-#' getLink(fit)
-getLink <- function(fit) {
-  UseMethod("getLink")
+#' getLinkInv(fit)
+getLinkInv <- function(fit) {
+  UseMethod("getLinkInv")
 }
 
 #' @export
-getLink.default <- function(fit) {
-  fit$family$link
+getLinkInv.default <- function(fit) {
+  fit$family$linkinv
 }
 
 #' @export
-getLink.glmerMod <- function(fit) {
+getLinkInv.glmerMod <- function(fit) {
   f <- family(fit)
   f$link
 }
 
 #' @export
-getLink.coxph <- function(fit) {
-  'log'
+getLinkInv.coxph <- function(fit) {
+  'exp'
 }

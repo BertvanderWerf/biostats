@@ -4,19 +4,30 @@
 \alias{predictModel}
 \title{predictModel}
 \usage{
-predictModel(fit, predictors, weights = NULL, df = NULL)
+predictModel(
+  fit,
+  predictors,
+  groupby = NULL,
+  weights = NULL,
+  vcov.out = !is.null(groupby),
+  estimate = "Estimate"
+)
 }
 \arguments{
 \item{fit}{a fitted model}
 
 \item{predictors}{newData for which predictions and variances are needed}
 
+\item{groupby}{a character vector with the names of the variables of predictors to group the results by}
+
 \item{weights}{a numeric vector with weights for each record in the predictors}
 
-\item{df}{the number of residual degrees of freedom, used for calculating the 95\% confidence limits. If omitted the function getDf(fit) will be used.}
+\item{vcov.out}{logical value, if true the vcov of the estimates is added as output}
+
+\item{estimate}{the name of the variable in getcoefficients(fit) denoting the coefficients}
 }
 \value{
-a list with predictions, covariance matrix of the predictions, family, link and df
+a list with the grouped predictions, variances and 95\% Confidence limits, the covariance matrix, predictor names, df, family, link and design matrix X
 }
 \description{
 predictModel
@@ -24,5 +35,6 @@ predictModel
 \examples{
 fit <- lm( y ~ ageclass*gender, data=data)
 pred <- createPredictors(fit)
-estimates <- predictmodel(fit, predictors=pred)
+predictions <- predictmodel(fit, predictors=pred)
+
 }

@@ -13,7 +13,7 @@ getFixedVars <- function(fit, data=NULL) {
   if (is.null(data)) {
     data <- getData(fit)
   }
-  formula <- extractFixedFormula(fit)
+  formula <- extractFixedFormula(formula(fit))
   terms <- getTerms(formula)
   labels <- labels(terms)
 

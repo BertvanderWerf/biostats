@@ -21,3 +21,8 @@ getDf.default <- function(fit) {
 getDf.glmerMod <- function(fit) {
   nobs(fit) - stats::extractAIC(fit)[1]
 }
+
+#' @export
+getDf.coxph <- function(fit) {
+  nobs(fit) - stats::extractAIC(fit)[1]
+}

@@ -234,3 +234,29 @@ t.splitMatrix <- function(x) {
   class(x) <- c('splitMatrix', class(x))
   x
 }
+
+#' @export
+`%*%.splitMatrix` <- function(x1, x2) {
+  print('yep')
+  if (is.splitMatrix(x1) & dim(x1)[2]!=1) {
+    x1 <- splitMatrix(x1, dim(x1)[1], 1)
+  } else if (!is.splitMatrix(x1)) {
+    x1 <- splitMatrix(x1, 1, 1)
+  }
+  if (is.splitMatrix(x2) & dim(x2)[1]!=1) {
+    x2 <- splitMatrix(x2, 1, dim(x2)[2])
+  } else if (!is.splitMatrix(x2)) {
+    x2 <- splitMatrix(x2, 1, 1)
+  }
+  nrows <- dim(x1)[1]
+  ncols <- dim(x2)[2]
+  out <- matrix(list(), nrow=nrows, ncol=ncols, dimnames=list(row.names(x1), colnames(x2)))
+  for (i in 1:nrows) {
+    for (j in 1: ncols) {
+      out[i,j][[1]] <- x1[i,1] %*% x2[1,j]
+    }
+  }
+  class(out) <- c('splitMatrix', class(out))
+  out
+}
+

@@ -24,12 +24,14 @@ createPredictors <- function(object, data=NULL, marginal=c('yes','no','minmax','
     Names <- object
   } else if (is.null(data)) {
     data <- getData(object)
-    Names <- getFixedVars(object, data=data)
-  }
+    Names <- biostats::getFixedVars(object, data=data)
+  } else (
+    Names <- biostats::getFixedVars(object, data=data)
+  )
   Factor <- sapply(data[,Names], is.factor)
   Text <- sapply(data[,Names], is.character)
   if (any(Text)) {
-    Warning('Having text as a predictor can cause problems because the order of the "levels" is not defined')
+    warning('Having text as a predictor can cause problems because the order of the "levels" is not defined')
   }
 
   if (marginal=='existing') {
