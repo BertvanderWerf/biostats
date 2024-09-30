@@ -23,3 +23,8 @@ getCoefficients.default <- function(fit) {
 #'   names(res)[names(res)=='coef'] <- 'Estimate'
 #'   res
 #' }
+
+#' @export
+getCoefficients.lnLik <- function(fit) {
+  fit$summary
+}

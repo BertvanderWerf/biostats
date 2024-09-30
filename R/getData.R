@@ -25,3 +25,8 @@ getData.default <- function(fit) {
 getData.lm <- function(fit) {
   return(fit$model)
 }
+
+#' @export
+getData.glmerMod <- function(fit) {
+  fit@frame
+}

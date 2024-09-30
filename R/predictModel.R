@@ -25,6 +25,7 @@ predictModel.default <- function(fit, predictors, groupby=NULL, weights=NULL, vc
   formula <- extractFixedFormula(formula(fit))
   c <- biostats::getCoefficients(fit)
   x <- model.matrix(formula, data=predictors)
+  pred <- predictors
 
   vcov <- as.matrix(vcov(fit))
 
@@ -45,6 +46,7 @@ predictModel.default <- function(fit, predictors, groupby=NULL, weights=NULL, vc
     }
     x <- X
   }
+
   i <- match( row.names(c), colnames(x),nomatch = 0)
   if (any(i==0)) {
     stop('the vector for parameter ',row.names(c)[i==0],' is not found in the design matrix')
@@ -129,4 +131,9 @@ predictModel.glm <- function(fit, predictors, groupby=NULL, weights=NULL, vcov.o
 
   class(est) <- c('glmEstimate', class(est))
   est
+}
+
+#' @export
+predictModel.glmerMod <- function(fit, predictors, groupby=NULL, weights=NULL, vcov.out=!is.null(groupby), estimate='Estimate') {
+  biostats:::predictModel.glm(fit, predictors, groupby, weights, vcov.out, estimate)
 }

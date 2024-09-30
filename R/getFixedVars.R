@@ -10,6 +10,11 @@
 #' fit <- lmer(count ~ gender*Age + (1|hospital), data=data)
 #' getFixedVars(fit)
 getFixedVars <- function(fit, data=NULL) {
+  UseMethod("getFixedVars")
+}
+
+#' @export
+getFixedVars.default <- function(fit, data=NULL) {
   if (is.null(data)) {
     data <- getData(fit)
   }
@@ -18,4 +23,13 @@ getFixedVars <- function(fit, data=NULL) {
   labels <- labels(terms)
 
   unique(names(data)[sapply(names(data), function(x) any(grepl(paste0('\\b',x,'\\b'), labels)))])
+}
+
+#' @export
+getFixedVars.lnLik <- function(fit, data=NULL) {
+  if (is.null(data)) {
+    data <- getData(fit)
+  }
+
+  unique(names(data)[sapply(names(data), function(x) any(grepl(paste0('\\b',x,'\\b'), fit$fixed.vars)))])
 }

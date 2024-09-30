@@ -78,7 +78,17 @@ getDifferences.default <- function(est, fact, fact.baseline=NULL, within=NULL, w
   diff <- addUpperLower(diff, df = est$df)
   diff <- addPvalue(diff, df=est$df)
 
+  names <- c('v1','v2')
+  if (est$link!='') {
+    names(diff) <- replacevalues(names(diff), names, paste(est$link, names, sep='.'))
+  }
+
   res <- list(differences=diff, diff.vcov=dvcov, X=dx)
+
+#   names <- c('v1','v2',estimate','variance','lower.95','upper.95')
+#   if (est$link!='') {
+#     names(pred) <- replacevalues(names(pred), names, paste(est$link, names, sep='.'))
+#   }
 
   # if needed calculate differences in differences
   if (!is.null(within.baseline)) {
@@ -97,6 +107,10 @@ getDifferences.default <- function(est, fact, fact.baseline=NULL, within=NULL, w
     diff <- addUpperLower(diff, df = est$df)
     diff <- addPvalue(diff, df=est$df)
 
+    names <- c('v1','v2')
+    if (est$link!='') {
+      names(diff) <- replacevalues(names(diff), names, paste(est$link, names, sep='.'))
+    }
 
     res$DID <- diff
     res$DID.vcov <- dvcov
