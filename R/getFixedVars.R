@@ -1,3 +1,41 @@
+#' lhs
+#' get the left hand side of a formula
+#'
+#' @param f a formula
+#'
+#' @returns the left hand side of the formula if it exists, otherwise NULL
+#' @export
+#'
+#' @examples
+#' f <- y ~ a + a/b + (1|c)
+#' lhs <- lhs(f)
+#' yvars <- all.vars(lhs)
+lhs <- function(f) {
+  f <- as.formula(f)
+  if (length(f)==3) f[[2]]
+  else NULL
+}
+
+#' rhs
+#' get the right hand side of a formula
+#'
+#' @param f a formula
+#'
+#' @returns the right hand side of the formula
+#' @export
+#'
+#' @examples
+#' f <- y ~ a + a/b + (1|c)
+#' rhs <- lhs(f)
+#' xvars <- all.vars(rhs)
+rhs <- function(f) {
+  f <- as.formula(f)
+  if (length(f)==3) f[[3]]
+  else if (length(f)==2) f[[2]]
+  else NULL
+}
+
+
 #' getFixedVars
 #'
 #' @param fit a fitted model
@@ -15,21 +53,39 @@ getFixedVars <- function(fit, data=NULL) {
 
 #' @export
 getFixedVars.default <- function(fit, data=NULL) {
-  if (is.null(data)) {
-    data <- getData(fit)
-  }
+  # if (is.null(data)) {
+  #   data <- getData(fit)
+  # }
   formula <- extractFixedFormula(formula(fit))
-  terms <- getTerms(formula)
-  labels <- labels(terms)
+  all.vars(formula)
 
-  unique(names(data)[sapply(names(data), function(x) any(grepl(paste0('\\b',x,'\\b'), labels)))])
+  # terms <- getTerms(formula)
+  # labels <- labels(terms)
+  # unique(unlist(strsplit(labels, "[^[:alnum:]\\._]+")))
+
 }
 
 #' @export
 getFixedVars.lnLik <- function(fit, data=NULL) {
-  if (is.null(data)) {
-    data <- getData(fit)
-  }
+  # if (is.null(data)) {
+  #   data <- getData(fit)
+  # }
 
-  unique(names(data)[sapply(names(data), function(x) any(grepl(paste0('\\b',x,'\\b'), fit$fixed.vars)))])
+  unique(unlist(strsplit(fit$fixed.vars, "[^[:alnum:]\\._]+")))
+
+  #unique(names(data)[sapply(names(data), function(x) any(grepl(paste0('\\b',x,'\\b'), fit$fixed.vars)))])
+}
+
+#' @export
+getFixedVars.nls <- function(fit, data=NULL) {
+  formula <- extractFixedFormula(formula(fit))
+  names <- all.vars(formula)
+  names[!names %in% names(fit$m$getAllPars())]
+}
+
+#' @export
+getFixedVars.gls <- function(fit, data=NULL) { # works also for class gnls
+  formula <- extractFixedFormula(formula(fit))
+  names <- c(all.vars(formula), names(fit$contrasts))
+  names[!names %in% names(fit$plist)]
 }

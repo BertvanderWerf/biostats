@@ -13,7 +13,7 @@
 #'
 #' @examples
 #' data <- cumcountby(data, 'cumcount', 'DurationInDays', c('Sex','Ethnicity'))
-cumcountby <- function(data, newvar, var, fact.names) {
+cumcountby <- function(data, newvar, da, fact.names) {
   stopifnot(var %in% names(data))
   stopifnot(all(fact.names %in% names(data)))
 

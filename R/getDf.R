@@ -14,7 +14,8 @@ getDf <- function(fit) {
 
 #' @export
 getDf.default <- function(fit) {
-  fit$df.residual
+  # fit$df.residual
+  nobs(fit) - stats::extractAIC(fit)[1]
 }
 
 #' @export
@@ -25,4 +26,16 @@ getDf.glmerMod <- function(fit) {
 #' @export
 getDf.coxph <- function(fit) {
   nobs(fit) - stats::extractAIC(fit)[1]
+}
+
+#' @export
+getDf.nls <- function(fit) {
+  df <- summary(fit)$df
+  df[2]
+}
+
+#' @export
+getDf.gnls <- function(fit) {
+  df <- summary(fit)$dims
+  df$N - df$p
 }

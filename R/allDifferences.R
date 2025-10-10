@@ -25,6 +25,10 @@ allDifferences <- function(estimates, vcov, df=NULL, estimate='estimate') {
     }
   }
   z <- diff/sqrt(var.diff)
+  cond <- setZero(diff)==0
+  if (any(cond)) {
+    z[cond] <- 0
+  }
   if (is.null(df)) {
     P <- (1 - pnorm(abs(z))) * 2
   } else {

@@ -8,12 +8,13 @@
 #' @param terms
 #' @param estimate
 #' @param sep
+#' @param use_row_names
 #'
 #' @return
 #' @export
 #'
 #' @examples
-getDifferences <- function(est, fact, fact.baseline=NULL, within=NULL, within.baseline=NULL, terms=c(fact, within), estimate='estimate', sep='.') {
+getDifferences <- function(est, fact, fact.baseline=NULL, within=NULL, within.baseline=NULL, terms=c(fact, within), estimate='estimate', sep='.', use_row_names=FALSE) {
   UseMethod("getDifferences")
 }
 
@@ -55,7 +56,7 @@ getDiffDesignMatrix <- function(data, fact, fact.baseline, within, sep=sep, term
 }
 
 #' @export
-getDifferences.default <- function(est, fact, fact.baseline=NULL, within=NULL, within.baseline=NULL, terms=c(fact, within), estimate='estimate', sep='.') {
+getDifferences.default <- function(est, fact, fact.baseline=NULL, within=NULL, within.baseline=NULL, terms=c(fact, within), estimate='estimate', sep='.', use_row_names=FALSE) {
   stopifnot(all(c('predictions','vcov') %in% names(est)))
   data <- est$predictions
   vcov <- est$vcov
@@ -64,7 +65,16 @@ getDifferences.default <- function(est, fact, fact.baseline=NULL, within=NULL, w
   if (!is.null(within)) {
     stopifnot(all(within %in% names(data)))
   }
-  row.names(data) <- NULL
+  if (!use_row_names) {
+    row.names(data) <- NULL
+  }
+
+  Adjust_X <- function(DX) { # sets the x[i,i] values to -1 for rowSums(abs(X))==0
+    dDX <- diag(DX)
+    dDX[rowSums(abs(DX))==0] <- -1
+    diag(DX) <- dDX
+    DX
+  }
 
   dx <- getDiffDesignMatrix(data, fact=fact, fact.baseline, within=terms[!(terms %in% fact)], terms, sep=sep)
 
@@ -73,7 +83,7 @@ getDifferences.default <- function(est, fact, fact.baseline=NULL, within=NULL, w
   v2 <- (-dx*(dx==-1)) %*% data[,estimate]
   diff <- setZero(dx %*% data[,estimate])
   diff <- cbind(data[,terms, drop=FALSE], v1=v1, v2=v2, estimate=c(diff), variance=c(diag(dvcov)))
-  z<-unlist(sapply(as.data.frame(t(dx)), function(y) row.names(dx)[y==-1], simplify = TRUE))
+  z<-unlist(sapply(as.data.frame(t(Adjust_X(dx))), function(y) row.names(dx)[y==-1], simplify = TRUE))
   row.names(diff) <- paste0("(",row.names(dx),") - (", z ,')')
   diff <- addUpperLower(diff, df = est$df)
   diff <- addPvalue(diff, df=est$df)
@@ -102,7 +112,7 @@ getDifferences.default <- function(est, fact, fact.baseline=NULL, within=NULL, w
     v2 <- (-dx*(dx==-1)) %*% data[,'estimate']
     diff <- setZero(dx %*% data[,'estimate'])
     diff <- cbind(data[,terms, drop=FALSE], v1=v1, v2=v2, estimate=c(diff), variance=c(diag(dvcov)))
-    z<-unlist(sapply(as.data.frame(t(dx)), function(y) row.names(dx)[y==-1], simplify = TRUE))
+    z<-unlist(sapply(as.data.frame(t(Adjust_X(dx))), function(y) row.names(dx)[y==-1], simplify = TRUE))
     row.names(diff) <- paste0("(",row.names(dx),") - (", z ,')')
     diff <- addUpperLower(diff, df = est$df)
     diff <- addPvalue(diff, df=est$df)
@@ -117,46 +127,61 @@ getDifferences.default <- function(est, fact, fact.baseline=NULL, within=NULL, w
     res$X2 <- dx
   }
 
+  if (est$link=='logit') {
+    ln.inv.logit <- function(x) { log(exp(x)/(1+exp(x))) }
+
+    res$differences$OR <- exp(res$differences[,'estimate'])
+    res$differences$OR.lower.95 <- exp(res$differences[,'estimate']-1.96*sqrt(res$differences[,'variance']))
+    res$differences$OR.upper.95 <- exp(res$differences[,'estimate']+1.96*sqrt(res$differences[,'variance']))
+
+    res$differences$RR <- exp(res$X %*% ln.inv.logit(est$predictions[,estimate]))
+
+    if (!is.null(res$DID)) {
+      res$DID$OR <- exp(res$DID[,'estimate'])
+      res$DID$OR.lower.95 <- exp(res$DID[,'lower.95'])
+      res$DID$OR.upper.95 <- exp(res$DID[,'upper.95'])
+
+      res$DID$RR <- exp(res$X2 %*% log(res$differences[,'RR']))
+    }
+  } else if (est$link=='log') {
+    res$differences$RR <- exp(res$differences[,'estimate'])
+    res$differences$RR.lower.95 <- exp(res$differences[,'estimate']-1.96*sqrt(res$differences[,'variance']))
+    res$differences$RR.upper.95 <- exp(res$differences[,'estimate']+1.96*sqrt(res$differences[,'variance']))
+
+    if (!is.null(res$DID)) {
+      res$DID$RR <- exp(res$DID[,'estimate'])
+      res$DID$RR.lower.95 <- exp(res$DID[,'lower.95'])
+      res$DID$RR.upper.95 <- exp(res$DID[,'upper.95'])
+    }
+  } else if (!is.null(est$link) && !(est$link %in% c('identity',''))) {
+    f <- get(est$linkinv)
+    name1 <- paste(est$link, 'v1', sep='.')
+    name2 <- paste(est$link, 'v2', sep='.')
+    if (name1 %in% names(res$differences) & name2 %in% names(res$differences)) {
+      res$differences$diff.median <- f(res$differences[,name1]) - f(res$differences[,name2])
+      res$differences$ratio.median <- f(res$differences[,name1]) / f(res$differences[,name2])
+    }
+   # warning('no rules implemented yet for the inverse of the differences for ',est$link)
+  }
+
   return(res)
 }
 
 #' @export
-getDifferences.glmEstimate <- function(est, fact, fact.baseline=NULL, within=NULL, within.baseline=NULL, terms=c(fact, within), estimate='estimate', sep='.') {
-  diff <- getDifferences.default(est, fact, fact.baseline, within, within.baseline, terms, estimate, sep)
-
-  if (est$family=='binomial' & est$link=='logit') {
-    ln.inv.logit <- function(x) { log(exp(x)/(1+exp(x))) }
-
-    diff$differences$OR <- exp(diff$differences[,'estimate'])
-    diff$differences$OR.lower.95 <- exp(diff$differences[,'estimate']-1.96*sqrt(diff$differences[,'variance']))
-    diff$differences$OR.upper.95 <- exp(diff$differences[,'estimate']+1.96*sqrt(diff$differences[,'variance']))
-
-    diff$differences$RR <- exp(diff$X %*% ln.inv.logit(est$predictions[,estimate]))
-
-    if (!is.null(diff$DID)) {
-      diff$DID$OR <- exp(diff$DID[,'estimate'])
-      diff$DID$OR.lower.95 <- exp(diff$DID[,'lower.95'])
-      diff$DID$OR.upper.95 <- exp(diff$DID[,'upper.95'])
-
-      diff$DID$RR <- exp(diff$X2 %*% log(diff$differences[,'RR']))
-    }
-  } else if (est$family=='poisson' & est$link=='log') {
-    diff$differences$RR <- exp(diff$differences[,'estimate'])
-    diff$differences$RR.lower.95 <- exp(diff$differences[,'estimate']-1.96*sqrt(diff$differences[,'variance']))
-    diff$differences$RR.upper.95 <- exp(diff$differences[,'estimate']+1.96*sqrt(diff$differences[,'variance']))
-
-    if (!is.null(diff$DID)) {
-      diff$DID$RR <- exp(diff$DID[,'estimate'])
-      diff$DID$RR.lower.95 <- exp(diff$DID[,'lower.95'])
-      diff$DID$RR.upper.95 <- exp(diff$DID[,'upper.95'])
-    }
-  }
+getDifferences.glmerModEstimate <- function(est, fact, fact.baseline=NULL, within=NULL, within.baseline=NULL, terms=c(fact, within), estimate='estimate', sep='.', use_row_names=FALSE) {
+  diff <- getDifferences.glmEstimate(est, fact, fact.baseline, within, within.baseline, terms, estimate, sep, use_row_names)
   diff
 }
 
 #' @export
-getDifferences.coxphEstimate <- function(est, fact, fact.baseline=NULL, within=NULL, within.baseline=NULL, terms=c(fact, within), estimate='estimate', sep='.') {
-  diff <- getDifferences.default(est, fact, fact.baseline, within, within.baseline, terms, estimate, sep)
+getDifferences.glmEstimate <- function(est, fact, fact.baseline=NULL, within=NULL, within.baseline=NULL, terms=c(fact, within), estimate='estimate', sep='.', use_row_names=FALSE) {
+  diff <- getDifferences.default(est, fact, fact.baseline, within, within.baseline, terms, estimate, sep, use_row_names)
+  diff
+}
+
+#' @export
+getDifferences.coxphEstimate <- function(est, fact, fact.baseline=NULL, within=NULL, within.baseline=NULL, terms=c(fact, within), estimate='estimate', sep='.', use_row_names=FALSE) {
+  diff <- getDifferences.default(est, fact, fact.baseline, within, within.baseline, terms, estimate, sep, use_row_names)
   diff
 }
 

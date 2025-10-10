@@ -10,15 +10,12 @@
 #' fit <- lm(y ~ x, data=data)
 #' getData(fit)
 getData <- function(fit) {
-  UseMethod("getData")
+ UseMethod("getData")
 }
 
 #' @export
 getData.default <- function(fit) {
-  if ('data' %in% names(fit)) {
-    return(fit$data)
-  }
-  stop("No 'data' variable can be found in the fitted list for class(",class(fit),"), please add data to the fitted object (see class glm)")
+  nlme::getData(fit)
 }
 
 #' @export
@@ -27,6 +24,18 @@ getData.lm <- function(fit) {
 }
 
 #' @export
-getData.glmerMod <- function(fit) {
-  fit@frame
+getData.merMod <- function(fit) {
+  as.data.frame(fit@frame)
 }
+
+#' @export
+getData.glmerMod <- function(fit) {
+  as.data.frame(fit@frame)
+}
+
+# #' @export
+# getData.lmerModLmerTest <- function(fit) {
+#   as.data.frame(fit@frame)
+# }
+
+

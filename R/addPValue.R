@@ -12,6 +12,10 @@
 #' @examples
 addPvalue <- function (pred, df=NULL, hypot=0, estimate='estimate', variance='variance') {
   z <- (pred[,estimate]-hypot)/sqrt(pred[,variance])
+  cond <- setZero(pred[,estimate]-hypot)==0
+  if (any(cond)) {
+    z[cond] <- 0
+  }
   if (is.null(df)) {
     pred$P_value <- (1 - pnorm(abs(z))) * 2
   } else {

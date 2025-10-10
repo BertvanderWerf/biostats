@@ -23,7 +23,7 @@ createPredictors <- function(object, data=NULL, marginal=c('yes','no','minmax','
     stopifnot(all(object %in% names(data)))
     Names <- object
   } else if (is.null(data)) {
-    data <- getData(object)
+    data <- nlme::getData(object)
     Names <- biostats::getFixedVars(object, data=data)
   } else (
     Names <- biostats::getFixedVars(object, data=data)

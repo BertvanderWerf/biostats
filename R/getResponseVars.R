@@ -13,7 +13,7 @@
 #' getResponseVars(fit)
 getResponseVars <- function(fit, data=NULL) {
   if (is.null(data)) {
-    data <- getData(fit)
+    data <- nlme::getData(fit)
   }
   terms <- getTerms(formula(fit))
   t <- row.names(attr(terms,'factors'))

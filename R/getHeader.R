@@ -15,7 +15,7 @@ getHeader <- function(colnames, sep1=';', sep2=':') {
   } else if (!is.character(colnames)) {
     stop('the parameter colnames must be a text vector')
   }
-  h <- sapply(colnames, function(x) {strsplit(x, sep1)[[1]]}, simplify = FALSE)
+  h <- sapply(colnames, function(x) {strsplit(x, sep1, fixed=TRUE)[[1]]}, simplify = FALSE)
   n <- sapply(h, length)
   m <- max(n, na.rm=TRUE)
   if (m==1) {

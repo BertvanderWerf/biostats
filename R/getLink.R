@@ -19,11 +19,32 @@ getLink.default <- function(fit) {
 
 #' @export
 getLink.glmerMod <- function(fit) {
-  f <- family(fit)
-  f$link
+ f <- family(fit)
+ f$link
 }
 
 #' @export
 getLink.coxph <- function(fit) {
-  'log'
+ 'log'
 }
+
+#' @export
+getLink.lmerModLmerTest <- function(fit) { # lmerTest::lmer
+  if (!is.null(attr(fit, 'family'))) {
+    f <- attr(fit, 'family')
+  } else {
+    f <- family(fit)
+  }
+  f$link
+}
+
+#' @export
+getLink.lmerMod <- function(fit) { # lme4::lmer
+  if (!is.null(attr(fit, 'family'))) {
+    f<-attr(fit, 'family')
+  } else {
+    f<-family(fit)
+  }
+  f$link
+}
+
