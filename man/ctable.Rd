@@ -9,16 +9,22 @@ ctable(
   variable,
   rows = NULL,
   cols = NULL,
-  fun = "nObs",
+  fun = NULL,
+  rfun = NULL,
+  cfun = NULL,
   rdrop = TRUE,
   cdrop = TRUE,
   na.rm = TRUE,
   hsep = c(".", ":"),
-  hkeep = FALSE,
-  vpos = ifelse(length(variable) == 1, 0, 1),
   vname = "variable",
-  fpos = ifelse(length(fun) == 1, ifelse(is.null(cols), Inf, 0), Inf),
-  internal.sep = "\\b",
+  vpos = 1,
+  fname = "function",
+  fpos = ifelse(is.null(cols), 1, 1 + length(cols)),
+  rmissing = "Missing",
+  cmissing = "Missing",
+  as.data.frame = TRUE,
+  header_minimal = TRUE,
+  envir = .GlobalEnv,
   ...
 )
 }
@@ -31,7 +37,7 @@ ctable(
 
 \item{cols}{a (named) character vector indicating the column factors of the table}
 
-\item{fun}{a (named) character vector with the function names}
+\item{fun}{a (named) character vector with the function names, default 'count'}
 
 \item{rdrop}{a logical indicting if the non existing row combinations should be dropped from the table}
 
@@ -41,15 +47,23 @@ ctable(
 
 \item{hsep}{a character string of two elements with the separators for the header, the first the separator between factorname and level, the second between the factors}
 
-\item{hkeep}{a logical indicating to keep all factor names and levels in the header, only used in simple headers}
+\item{vname}{the name of the column for the variables}
 
 \item{vpos}{The position of the variables in the row classification}
 
-\item{vname}{the name of the column for the variables}
+\item{fname}{the name for the functions}
 
 \item{fpos}{the position of the functions in the column classification}
 
-\item{internal.sep}{internal separation character used in the function interaction}
+\item{rmissing}{The factor level name for missing row factor values}
+
+\item{cmissing}{The factor level name for missing column factor values}
+
+\item{as.data.frame}{Logical indicating whether to return a plain data.frame instead of a ctable object (default: TRUE)}
+
+\item{header_minimal}{Logical controlling header simplification when \code{as.data.frame = TRUE} (default: TRUE)}
+
+\item{envir}{environment to evaluate the function names in fun, rfun and cfun default .GlobalEnv}
 
 \item{...}{extra parameters to give to one or more of the functions in fun}
 }

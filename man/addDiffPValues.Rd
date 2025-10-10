@@ -4,10 +4,10 @@
 \alias{addDiffPValues}
 \title{addDiffPValues}
 \usage{
-addDiffPValues(data, vcov, df = NULL, estimate = "estimate")
+addDiffPValues(data, vcov, df = NULL, estimate = "estimate", method = "none")
 }
 \arguments{
-\item{estimate}{}
+\item{method}{the default method is no corrections see stats::p.adjust}
 }
 \description{
 addDiffPValues

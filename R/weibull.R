@@ -19,7 +19,7 @@
 #'
 #' pdfWeibull(x, k, lambda, c)
 #' cdfWeibull(x, k, lambda, c)
-#' initialWeibull(x)
+#' initialWeibull(x, p=NULL)
 #' meanWeibull(k, lambda, c)
 #' medianWeibull(k, lambda, c)
 #' modeWeibull(k, lambda, c)
@@ -49,18 +49,34 @@ drule[['qWeibull']] <- sapply(c('x','k','lambda','c'),
                                simplify = FALSE)
 
 #' @export
-initialWeibull <- function(x) {
-  if ('difftime' %in% class(x)) {
+initialWeibull <- function (x, p=NULL) {
+  if ("difftime" %in% class(x)) {
     x <- as.numeric(x)
   }
-  # starting values: # https://uomustansiriyah.edu.iq/media/lectures/6/6_2021_01_01!11_59_52_PM.pdf
-  m <- mean(x, na.rm = TRUE)
-  v <- sd(x, na.rm=TRUE)
+  if (is.null(p)) {
+    m <- mean(x, na.rm = TRUE)
+    v <- sd(x, na.rm = TRUE)
+  } else {
+    m <- sum(x*p, na.rm=TRUE)/sum(p, na.rm=TRUE)
+    v <- sqrt(sum(p*x*x, na.rm=TRUE)/sum(p, na.rm=TRUE)-m*m)
+  }
+  print(paste(m,v))
   k <- (v/m)^-1.086
-  #lambda <- m/gamma(1+1/k)
-  lambda <- m*k^2.6674/(0.184+0.816*k^2.73855)
-  c(k=k, lambda=lambda, c=0)
+  lambda <- m * k^2.6674/(0.184 + 0.816 * k^2.73855)
+  c(k = k, lambda = lambda, c = 0)
 }
+# initialWeibull <- function(x) {
+#   if ('difftime' %in% class(x)) {
+#     x <- as.numeric(x)
+#   }
+#   # starting values: # https://uomustansiriyah.edu.iq/media/lectures/6/6_2021_01_01!11_59_52_PM.pdf
+#   m <- mean(x, na.rm = TRUE)
+#   v <- sd(x, na.rm=TRUE)
+#   k <- (v/m)^-1.086
+#   #lambda <- m/gamma(1+1/k)
+#   lambda <- m*k^2.6674/(0.184+0.816*k^2.73855)
+#   c(k=k, lambda=lambda, c=0)
+# }
 
 
 #' @export

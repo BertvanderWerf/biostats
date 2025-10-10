@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples
-print.ctable <- function(crosstable, sep1=';', sep2=':') {
+print.ctable <- function(crosstable, sep1='.', sep2=':') {
   stopifnot('ctable' %in% class(crosstable))
   h <- getHeader(crosstable, sep1=sep1, sep2=sep2) # to do: include in package
   n <- nrow(h)
@@ -24,3 +24,33 @@ print.ctable <- function(crosstable, sep1=';', sep2=':') {
   }
   print(crosstable, row.names=FALSE, na.print='')
 }
+
+#
+# print.ctable <- function(table, htype='minimal', sep1=attr(table, 'hsep')[1],
+#                          sep2=attr(table, 'hsep')[2], ...) {
+#   htype <- match.arg(htype, c('minimal','maximal'))
+#   header <- cols(table)
+#   keys <- rows(table)
+#   if (htype=='minimal') {
+#     cond <- !sapply(header, function(x) { is.null(x) || length(x)==0 || all(x==first(x))})
+#     header <- header[,cond, drop=FALSE]
+#     cond <- sapply(keys, function(x) { is.null(x) || length(x)==0 || all(x == first(x))})
+#     if (any(cond)) {
+#       cond <- !cond
+#       table <- table[,c(cond, rep(TRUE, nrow(header)))]
+#       keys <- keys[,cond, drop=FALSE]
+#     }
+#     if (ncol(header)==1) {
+#       names(table) <- c(names(keys), header[,1])
+#     } else {
+#       header <- split(header, row.names(header), drop=TRUE)
+#       header <- rapply(header, function(x) {levels(x)[x]}, classes='factor', how='replace')
+#       new_names <- sapply(header, paste, collapse=sep2)
+#       names(table) <- c(names(keys), new_names)
+#     }
+#     print(as.data.frame(table), row.names=FALSE, na.print=''))
+#   }
+#
+#   names(table) <- c(names(keys), header_to_column_names(header, sep1, sep2))
+#   print(table, row.names=FALSE, na.print='')
+# }

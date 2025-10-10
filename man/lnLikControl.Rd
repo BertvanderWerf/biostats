@@ -14,7 +14,8 @@ lnLikControl(
   lambda.multiplier = 10,
   reduce = TRUE,
   replaceNAN = FALSE,
-  useGInv = FALSE
+  useGInv = FALSE,
+  replaceInf = FALSE
 )
 }
 \arguments{
@@ -34,9 +35,11 @@ lnLikControl(
 
 \item{reduce}{A logical indicating to reduce the dataset if possible}
 
-\item{replaceNAN}{replace NAN and Inf with zeros in derivatives}
+\item{replaceNAN}{replace NAN  with zeros in derivatives}
 
 \item{useGInv}{use generalised inverse}
+
+\item{replaceINF}{replace Inf with .machine$double.xmax and -Inf with .machine$double.xmin in derivatives}
 }
 \value{
 The control function return a list containing

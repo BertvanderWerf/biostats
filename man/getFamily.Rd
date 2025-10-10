@@ -10,7 +10,7 @@ getFamily(fit)
 \item{fit}{a fitted model}
 }
 \value{
-the family of the model
+the family name of the model
 }
 \description{
 getFamily

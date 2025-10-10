@@ -12,11 +12,12 @@ getDifferences(
   within.baseline = NULL,
   terms = c(fact, within),
   estimate = "estimate",
-  sep = "."
+  sep = ".",
+  use_row_names = FALSE
 )
 }
 \arguments{
-\item{sep}{}
+\item{use_row_names}{}
 }
 \description{
 getDifferences

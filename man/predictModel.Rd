@@ -9,8 +9,10 @@ predictModel(
   predictors,
   groupby = NULL,
   weights = NULL,
-  vcov.out = !is.null(groupby),
-  estimate = "Estimate"
+  vcov = NULL,
+  vcov.out = TRUE,
+  estimate = "Estimate",
+  ...
 )
 }
 \arguments{
@@ -20,11 +22,15 @@ predictModel(
 
 \item{groupby}{a character vector with the names of the variables of predictors to group the results by}
 
-\item{weights}{a numeric vector with weights for each record in the predictors}
+\item{weights}{a numeric vector with weights for each record in the predictors, weights are ignored when groupby=NULL}
+
+\item{vcov}{a predefined variance-covariance to be used instead of the automatically calculated stats::vcov(fit) when vcov.out=TRUE, vcov.out will be set to TRUE}
 
 \item{vcov.out}{logical value, if true the vcov of the estimates is added as output}
 
-\item{estimate}{the name of the variable in getcoefficients(fit) denoting the coefficients}
+\item{estimate}{the name of the variable in getcoefficients(fit) denoting the coefficient values}
+
+\item{...}{additional parameters}
 }
 \value{
 a list with the grouped predictions, variances and 95\% Confidence limits, the covariance matrix, predictor names, df, family, link and design matrix X

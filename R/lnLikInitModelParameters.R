@@ -26,24 +26,25 @@
 #' $c
 #' (Intercept)
 #' 0
-lnLikInitModelParameters <- function(p, models, parnames, weights=NULL) {
+lnLikInitModelParameters <- function (p, models, parnames, weights = NULL) {
   for (i in 1:length(fact)) {
-    if (i==1) par <- list()
+    if (i == 1) par <- list()
     parname <- parnames[i]
     if (!is.null(models[[i]])) {
-      rows <- getFixedVars(fact[[i]], data=p)
-      if (is.null(weights)) { # take unweighted means
-        mat <- ctable(p, parname, rows, fun='mean')
+      rows <- getFixedVars(fact[[i]])
+      if (is.null(weights)) {
+        mat <- ctable(p, parname, rows, fun = "mean")
       } else {
-        p$Weighted.par <- p[,weights]*p[,parname]
-        mat <- ctable(p, c('Weighted.par',weights), rows, fun='sum')
-        mat <- ctable(mat, 'sum', rows=rows, cols='variable', fun='sum')
-        mat$mean <- mat$Weighted.par/mat[,weights]
+        p$Weighted.par <- p[, weights] * p[, parname]
+        mat <- ctable(p, c("Weighted.par", weights), rows, fun = "sum")
+        mat <- ctable(mat, "sum", rows = rows, cols = "variable",
+                      fun = "sum", hsep=c('\n','\t'))[,-1]
+        mat$mean <- mat$Weighted.par/mat[, weights]
       }
       matx <- model.matrix(fact[[i]], mat)
-      par[[i]] <- solve(matx, mat[,'mean'])
+      par[[i]] <- solve(matx, mat[, "mean"])
     } else {
-      par[[i]] <- mean(p[,parname], na.rm=TRUE)
+      par[[i]] <- mean(p[, parname], na.rm = TRUE)
     }
   }
   names(par) <- parnames

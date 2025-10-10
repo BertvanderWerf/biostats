@@ -13,11 +13,18 @@ getSimulatedDifferences(
   terms = c(fact, within),
   estimate = "estimate",
   sep = ".",
-  nsimulations = 10000
+  nsimulations = 10000,
+  diff_h0 = 0,
+  ratio_h0 = 1,
+  p_value_type = "two_sided"
 )
 }
 \arguments{
-\item{nsimulations}{}
+\item{diff_h0}{default 0}
+
+\item{ratio_h0}{default 1}
+
+\item{p_value_type}{default two_dided}
 }
 \description{
 getSimulatedDifferences

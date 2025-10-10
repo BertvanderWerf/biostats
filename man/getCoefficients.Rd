@@ -4,10 +4,12 @@
 \alias{getCoefficients}
 \title{getCoefficients}
 \usage{
-getCoefficients(fit)
+getCoefficients(fit, vcov = NULL)
 }
 \arguments{
 \item{fit}{a fitted model}
+
+\item{vcov}{the covariance of the parameters default NULL uses vcov(fit)}
 }
 \value{
 a dataframe with Estimates, Std. Error, a statistic and P values

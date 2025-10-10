@@ -428,3 +428,17 @@ print.lnLik <- function(fit) {
        submodels=fit$parinfo$fact,
        summary=AIC(fit))
 }
+
+#' @export
+getData.lnLik <- function(fit) {
+  fit$data
+}
+
+#' @export
+vcov.lnLik <- function(fit, complete=TRUE) {
+  if (isTRUE(complete)) {
+    return(fit$vcov)
+  }
+  cond <- as.logical(summary(fit$parinfo)$parameters$cond)
+  fit$vcov[cond, cond]
+}

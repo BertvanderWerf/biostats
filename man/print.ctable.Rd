@@ -4,7 +4,7 @@
 \alias{print.ctable}
 \title{print.ctable}
 \usage{
-\method{print}{ctable}(crosstable, sep1 = ";", sep2 = ":")
+\method{print}{ctable}(crosstable, sep1 = ".", sep2 = ":")
 }
 \arguments{
 \item{sep2}{}

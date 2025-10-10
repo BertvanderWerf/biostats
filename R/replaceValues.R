@@ -80,7 +80,9 @@ replacevalues <- function (vec, oldvalues, newvalues, warnings = TRUE, droplevel
     i <- match(vec, oldvalues, nomatch = 0)
     c <- i > 0
     i <- i[c]
-    vec[c] <- newvalues[i]
+    if (length(i)>0) {
+      vec[c] <- newvalues[i]
+    }
   }
   return(vec)
 }

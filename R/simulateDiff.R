@@ -88,7 +88,6 @@ simulateDiff <- function(data, Pair, estimate, variance, firstdiff, seconddiff=N
 
   for (nsim in 0:nSimulations) {
     if (nsim==0 & nSimulations>0) {
-      library(MASS)
       sims <- MASS::mvrnorm(nSimulations, z$estimates[,estimate], z$vcov)
       Res <- list()
       for (i in 1:length(simvar)) {
@@ -119,7 +118,12 @@ simulateDiff <- function(data, Pair, estimate, variance, firstdiff, seconddiff=N
     }
     indices$diff.lower.95 <- indices$diff-1.96*sqrt(indices$diff.variance)
     indices$diff.upper.95 <- indices$diff+1.96*sqrt(indices$diff.variance)
-    indices$diff.p_value <- (1 - pnorm(abs(indices$diff/sqrt(indices$diff.variance)))) * 2
+    zval <- indices$diff/sqrt(indices$diff.variance)
+    cond <- setZero(indices$diff)==0
+    if (any(cond)) {
+      zval[cond] <- 0
+    }
+    indices$diff.p_value <- (1 - pnorm(abs(zval))) * 2
 
     indices[,paste0('delta.',estimate)] <- indices[,estimate]-indices[indices$j, estimate]
     indices[,paste0('ratio.',estimate)] <- indices[,estimate]/indices[indices$j, estimate]
@@ -158,7 +162,12 @@ simulateDiff <- function(data, Pair, estimate, variance, firstdiff, seconddiff=N
     }
     indices$diff2.lower.95 <- indices$diff2 - 1.96*sqrt(indices$diff2.variance)
     indices$diff2.upper.95 <- indices$diff2 + 1.96*sqrt(indices$diff2.variance)
-    indices$diff2.p_value <- (1 - pnorm(abs(indices$diff2/sqrt(indices$diff2.variance)))) * 2
+    zval <- indices$diff2/sqrt(indices$diff2.variance)
+    cond <- setZero(indices$diff2)==0
+    if (any(cond)) {
+      zval[cond] <- 0
+    }
+    indices$diff2.p_value <- (1 - pnorm(abs(zval))) * 2
 
     if (!is.null(inverse)) {
       for (i in 1:length(inverse)) {

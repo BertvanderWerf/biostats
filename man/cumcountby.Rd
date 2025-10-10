@@ -4,16 +4,16 @@
 \alias{cumcountby}
 \title{cumcountby}
 \usage{
-cumcountby(data, newvar, var, fact.names)
+cumcountby(data, newvar, da, fact.names)
 }
 \arguments{
 \item{data}{a dataframe containing the classifying factors and variable name var}
 
 \item{newvar}{The name of the newly created variable}
 
-\item{var}{the variable to use as the ordering variable}
-
 \item{fact.names}{the factor names of the calssification}
+
+\item{var}{the variable to use as the ordering variable}
 }
 \value{
 the data frame data with a new variable indicating the classification and a new variable indicating the cumulative counts

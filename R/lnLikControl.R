@@ -14,8 +14,9 @@
 #' @param lambda the lambda value in levenberg
 #' @param lambda.multiplier the lambda multiplier in levenberg-marquardt
 #' @param reduce A logical indicating to reduce the dataset if possible
-#' @param replaceNAN replace NAN and Inf with zeros in derivatives
+#' @param replaceNAN replace NAN  with zeros in derivatives
 #' @param useGInv use generalised inverse
+#' @param replaceINF replace Inf with .machine$double.xmax and -Inf with .machine$double.xmin in derivatives
 #'
 #' @return The control function return a list containing
 #' 1. general control parameters, method, hessian type
@@ -27,12 +28,12 @@
 lnLikControl <- function(method=c('NewtonRaphson','Levenberg','Marquardt'),
                         criterium=c('delta','jacobian','lnlik'), eps=1e-7, nsteps=200,
                         hessian=c('calculate','expected'), lambda=1, lambda.multiplier=10,
-                        reduce=TRUE, replaceNAN=FALSE, useGInv=FALSE) {
+                        reduce=TRUE, replaceNAN=FALSE, useGInv=FALSE, replaceInf=FALSE) {
 
   method <- match.arg(method)
   hessian <- match.arg(hessian)
   criterium <- match.arg(criterium, several.ok = TRUE)
   list(method=method, criterium=criterium, hessian=hessian, eps=eps, nsteps=nsteps,
        lambda=lambda, lambda.multiplier=lambda.multiplier, reduce=reduce,
-       replaceNAN=replaceNAN, useGInv=useGInv)
+       replaceNAN=replaceNAN, useGInv=useGInv, replaceInf=replaceInf)
 }

@@ -28,7 +28,7 @@ been added too.
 \details{
 pdfWeibull(x, k, lambda, c)
 cdfWeibull(x, k, lambda, c)
-initialWeibull(x)
+initialWeibull(x, p=NULL)
 meanWeibull(k, lambda, c)
 medianWeibull(k, lambda, c)
 modeWeibull(k, lambda, c)
