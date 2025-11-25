@@ -3,16 +3,16 @@
 #'
 #' Density (pdf) and cumulative density (cdf) Weibull distribution functions with
 #' parameters shape (k), scale(lambda) and location (c). The functions are well suited
-#' to be used in the lnLik function as their derivatives have already been derived
+#' to be used in the logLik function as their derivatives have already been derived
 #' pdfWeibull, cdfWeibull are in principle reparamaterisations of the dweibull and
-#' qweibull of the stats package. In addition moment estimaters can be made using the
+#' qweibull of the stats package. In addition moment estimators can be made using the
 #' function initWeibull. Summary statistics can be derived from the parameters using
 #' meanWeibull, medianWeibull, modeWeibull. The hazard function hazardWeibull has
 #' been added too.
 #'
 #' @param x vector of quantiles
-#' @param k shape paramter
-#' @param lambda scale paramter
+#' @param k shape parameter
+#' @param lambda scale parameter
 #' @param c offset parameter
 #'
 #' @details
@@ -65,6 +65,7 @@ initialWeibull <- function (x, p=NULL) {
   lambda <- m * k^2.6674/(0.184 + 0.816 * k^2.73855)
   c(k = k, lambda = lambda, c = 0)
 }
+
 # initialWeibull <- function(x) {
 #   if ('difftime' %in% class(x)) {
 #     x <- as.numeric(x)

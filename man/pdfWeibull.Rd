@@ -9,18 +9,18 @@ pdfWeibull(x, k, lambda, c)
 \arguments{
 \item{x}{vector of quantiles}
 
-\item{k}{shape paramter}
+\item{k}{shape parameter}
 
-\item{lambda}{scale paramter}
+\item{lambda}{scale parameter}
 
 \item{c}{offset parameter}
 }
 \description{
 Density (pdf) and cumulative density (cdf) Weibull distribution functions with
 parameters shape (k), scale(lambda) and location (c). The functions are well suited
-to be used in the lnLik function as their derivatives have already been derived
+to be used in the logLik function as their derivatives have already been derived
 pdfWeibull, cdfWeibull are in principle reparamaterisations of the dweibull and
-qweibull of the stats package. In addition moment estimaters can be made using the
+qweibull of the stats package. In addition moment estimators can be made using the
 function initWeibull. Summary statistics can be derived from the parameters using
 meanWeibull, medianWeibull, modeWeibull. The hazard function hazardWeibull has
 been added too.
