@@ -54,12 +54,12 @@ predictModel.default <- function(fit, predictors, groupby=NULL, weights=NULL, vc
 
   pred <- predictors # pred will be modified, predictors are needed
 
-  c <- biostats::getCoefficients(fit)
-  x <- model.matrix(formula, data=pred)
-
   if (is.null(vcov)) {
     vcov <- as.matrix(vcov(fit))
   }
+
+  c <- biostats::getCoefficients(fit, vcov=vcov)
+  x <- model.matrix(formula, data=pred)
 
   bDebug <- TRUE
   if (!is.null(groupby)) {
@@ -230,7 +230,7 @@ predictModel.lmerModLmerTest <- function(fit, predictors, groupby=NULL, weights=
 }
 
 #' @export
-predictModel.lmerMod <- function(fit, predictors, groupby=NULL, weights=NULL, vcov=NULL, vcov.out=RUE, estimate='Estimate') {
+predictModel.lmerMod <- function(fit, predictors, groupby=NULL, weights=NULL, vcov=NULL, vcov.out=TRUE, estimate='Estimate') {
   est <- biostats:::predictModel.glm(fit, predictors, groupby=groupby, weights=weights, vcov=vcov, vcov.out=vcov.out, estimate=estimate)
   class(est) <- c('lmerModlmerMod', class(est)[class(est)!='glmEstimate'])
   est

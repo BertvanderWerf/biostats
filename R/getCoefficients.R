@@ -30,7 +30,12 @@ getCoefficients.default <- function(fit, vcov=NULL) {
   } else {
     res <- out
   }
-  res$sig <- p_to_stars(res[,grepl('^Pr(*)', names(res), fixed=FALSE)])
+  if (any(grepl('^Pr(*)', names(res), fixed=FALSE))) {
+    res$sig <- p_to_stars(res[,grepl('^Pr(*)', names(res), fixed=FALSE)])
+  } else if ('t value' %in% names(res)) {
+    res$'Pr(>|t|)' <- pt(-abs(res$'t value'), res$df)*2
+    res$sig <- p_to_stars(res[,grepl('^Pr(*)', names(res), fixed=FALSE)])
+  }
   res <- cbind(Parameter=row.names(res), res)
   res
   # res <- cbind(Parameter=row.names(res), res)
