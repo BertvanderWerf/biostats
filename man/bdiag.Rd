@@ -6,9 +6,6 @@
 \usage{
 bdiag(L)
 }
-\arguments{
-\item{L}{}
-}
 \description{
 bdiag
 }

@@ -9,12 +9,12 @@
 #' @examples
 #' fit <- lm(y ~ AgeGroup, data=data)
 #' getCoefficients(fit)
-getCoefficients <- function(fit, vcov=NULL) {
+getCoefficients <- function(fit, vcov=NULL, ...) {
   UseMethod('getCoefficients')
 }
 
 #' @export
-getCoefficients.default <- function(fit, vcov=NULL) {
+getCoefficients.default <- function(fit, vcov=NULL, ...) {
   out <- as.data.frame(summary(fit)$coefficients)
   if (!is.null(vcov)) {
     res <- data.frame(Estimate=out$Estimate)
@@ -51,12 +51,12 @@ getCoefficients.default <- function(fit, vcov=NULL) {
 #' }
 
 #' @export
-getCoefficients.lnLik <- function(fit, vcov=NULL) {
+getCoefficients.lnLik <- function(fit, vcov=NULL, ...) {
   fit$summary
 }
 
 #' @export
-getCoefficients.gls <- function(fit, vcov=NULL) {
+getCoefficients.gls <- function(fit, vcov=NULL, ...) {
   df <- getDf(fit)
   if (is.null(vcov)) {
     vcov=vcov(fit)
@@ -72,4 +72,27 @@ getCoefficients.gls <- function(fit, vcov=NULL) {
 
   res$sig <- p_to_stars(res[,grepl('^Pr(*)', names(res), fixed=FALSE)])
   res
+}
+
+#' @export
+getCoefficients.glmmTMB <- function(fit, vcov=NULL, component=c('cond', 'zi', 'disp'), full=FALSE, ...) {
+  component <- match.arg(component)
+  s <- summary(fit)$coefficients
+  if (component=='cond' && 'cond' %in% names(s)) {
+    s <- as.data.frame(s$cond)
+  } else if (component=='zi' && 'zi' %in% names(s)) {
+    s <- as.data.frame(s$zi)
+  } else if (component=='disp' && 'disp' %in% names(s)) {
+    s <- as.data.frame(s$disp)
+  } else {
+    s <- NULL
+  }
+  if (!is.null(s) && isFALSE(full) && any(is.na(s$Estimate))) {
+    s <- s[!is.na(s$Estimate),, drop=FALSE]
+  }
+  if (!is.null(s)) {
+    s <- cbind(Parname=row.names(s), s)
+    s$sig <- p_to_stars(s[,grepl('^Pr(*)', names(s), fixed=FALSE)])
+  }
+  s
 }

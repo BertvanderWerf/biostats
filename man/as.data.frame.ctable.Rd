@@ -6,9 +6,6 @@
 \usage{
 \method{as.data.frame}{ctable}(table, col.names = NULL, header_minimal = TRUE, ...)
 }
-\arguments{
-\item{...}{}
-}
 \description{
 as.data.frame.ctable
 }

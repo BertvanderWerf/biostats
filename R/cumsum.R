@@ -19,13 +19,21 @@
 CumSum <- function(x, cum_var = NULL, order_by = NULL, group_vars = NULL, scale = TRUE, na_rm = TRUE) {
   # Internal function to compute cumsum on subset
   cumsum_subset <- function(df, cum_var, order_by, scale, na_rm) {
-    idx <- if (!is.null(order_by)) order(df[[order_by]]) else seq_len(nrow(df))
+   idx <- if (!is.null(order_by)) 
+      order(df[[order_by]])
+    else seq_len(nrow(df))
+    
+    na_mask <- rowSums(sapply(df[, c(cum_var, order_by), drop=FALSE], is.na))>0
+    na_mask <- na_mask[idx]
+    
     values <- df[[cum_var]][idx]
-    na_mask <- is.na(values)
+    
+    #na_mask <- is.na(values)
     values[na_mask & na_rm] <- 0
     cs <- cumsum(values)
     cs[na_mask & na_rm] <- NA
-    if (scale) cs <- cs / max(cs, na.rm = TRUE)
+    if (scale) 
+      cs <- cs/max(cs, na.rm = TRUE)
     out <- cs[order(idx)]
     return(out)
   }

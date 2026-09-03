@@ -4,7 +4,7 @@
 \alias{getCoefficients}
 \title{getCoefficients}
 \usage{
-getCoefficients(fit, vcov = NULL)
+getCoefficients(fit, vcov = NULL, ...)
 }
 \arguments{
 \item{fit}{a fitted model}

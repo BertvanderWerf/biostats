@@ -6,9 +6,6 @@
 \usage{
 sandwich_vcov(model, ...)
 }
-\arguments{
-\item{type}{}
-}
 \description{
 sandwich_vcov
 }

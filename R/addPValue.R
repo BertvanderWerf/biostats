@@ -13,7 +13,7 @@
 addPvalue <- function (pred, df=NULL, hypot=0, estimate='estimate', variance='variance') {
   z <- (pred[,estimate]-hypot)/sqrt(pred[,variance])
   cond <- setZero(pred[,estimate]-hypot)==0
-  if (any(cond)) {
+  if (!all(is.na(cond)) && any(cond)) {
     z[cond] <- 0
   }
   if (is.null(df)) {

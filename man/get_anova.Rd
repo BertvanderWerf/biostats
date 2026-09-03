@@ -6,9 +6,6 @@
 \usage{
 get_anova(model, vcov = NULL, test = "Chisq", use_default = TRUE)
 }
-\arguments{
-\item{test}{}
-}
 \description{
 get_anova
 }

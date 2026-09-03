@@ -6,9 +6,6 @@
 \usage{
 \method{as.matrix}{ctable}(x, sep = ".", ...)
 }
-\arguments{
-\item{...}{}
-}
 \description{
 as.matrix.ctable
 }

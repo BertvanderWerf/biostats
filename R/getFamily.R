@@ -2,6 +2,7 @@
 #' getFamily
 #'
 #' @param fit a fitted model
+#' @param ...
 #'
 #' @return the family name of the model
 #' @export
@@ -9,28 +10,28 @@
 #' @examples
 #' fit <- glm(count ~ gender, family=binomial, data=data)
 #' getFamily(fit)
-getFamily <- function(fit) {
+getFamily <- function(fit, ...) {
   UseMethod('getFamily')
 }
 
 #' @export
-getFamily.default <- function(fit) {
+getFamily.default <- function(fit, ...) {
   return(fit$family$family)
 }
 
 #' @export
-getFamily.glmerMod <- function(fit) {
+getFamily.glmerMod <- function(fit, ...) {
   f<-family(fit)
   f$family
 }
 
 #' @export
-getFamily.coxph <- function(fit) {
+getFamily.coxph <- function(fit, ...) {
   'coxph'
 }
 
 #' @export
-getFamily.lmerModLmerTest <- function(fit) { # lmerTest::lmer
+getFamily.lmerModLmerTest <- function(fit, ...) { # lmerTest::lmer
   if (!is.null(attr(fit, 'family'))) {
     f <- attr(fit, 'family')
   } else {
@@ -40,11 +41,23 @@ getFamily.lmerModLmerTest <- function(fit) { # lmerTest::lmer
 }
 
 #' @export
-getFamily.lmerMod <- function(fit) { # lme4::lmer
+getFamily.lmerMod <- function(fit, ...) { # lme4::lmer
   if (!is.null(attr(fit, 'family'))) {
     f<-attr(fit, 'family')
   } else {
     f<-family(fit)
   }
   f$family
+}
+
+#' @export
+getFamily.glmmTMB <- function(fit, component=c('cond', 'zi', 'disp'), ...) {
+  component <- match.arg(component)
+  if (component=='cond') {
+    fit$modelInfo$family
+  } else if (component=='zi') {
+    binomial(logit)
+  } else if (component=='disp') {
+    gaussian()
+  }
 }

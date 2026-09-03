@@ -4,7 +4,7 @@
 \alias{getFormula}
 \title{getFormula}
 \usage{
-getFormula(fit)
+getFormula(fit, ...)
 }
 \arguments{
 \item{fit}{fitted model}

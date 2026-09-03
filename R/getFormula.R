@@ -2,6 +2,7 @@
 #' getFormula
 #'
 #' @param fit fitted model
+#' @param ...
 #'
 #' @return the original dataset used in the regression
 #' @export
@@ -9,17 +10,17 @@
 #' @examples
 #' fit <- lm(y ~ x, data=data)
 #' getData(fit)
-getFormula <- function(fit) {
+getFormula <- function(fit, ...) {
   UseMethod("getFormula")
 }
 
 #' @export
-getFormula.default <- function(fit) {
+getFormula.default <- function(fit, ...) {
   formula(fit)
 }
 
 #' @export
-getFormula.gnls <- function(fit) {
+getFormula.gnls <- function(fit, ...) {
   res <- formula(fit)
 
   c <- fit$call
@@ -42,3 +43,36 @@ getFormula.gnls <- function(fit) {
   attr(res, 'params') <- Params[match(names(Params), parNames)]
   res
 }
+
+#' @export
+getFormula.glmmTMB <- function(fit, component=c('cond', 'zi', 'disp'), ...) {
+  remove_offset <- function(f) {
+    drop_offset <- function(x) {
+      if (!is.call(x))
+        return(x)
+
+      if (identical(x[[1]], quote(offset)))
+        return(NULL)
+
+      if (identical(x[[1]], quote(`+`))) {
+        lhs <- drop_offset(x[[2]])
+        rhs <- drop_offset(x[[3]])
+
+        if (is.null(lhs)) return(rhs)
+        if (is.null(rhs)) return(lhs)
+
+        return(call("+", lhs, rhs))
+      }
+
+      x
+    }
+
+    rhs_pos <- if (length(f) == 3L) 3L else 2L
+    f[[rhs_pos]] <- drop_offset(f[[rhs_pos]])
+
+    f
+  }
+  component <- match.arg(component)
+  remove_offset(formula(fit, component=component))
+}
+

@@ -6,9 +6,6 @@
 \usage{
 adjustVcov(vcov)
 }
-\arguments{
-\item{tol}{}
-}
 \description{
 adjustVcov
 }

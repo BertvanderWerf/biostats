@@ -4,7 +4,7 @@
 \alias{getFamily}
 \title{getFamily}
 \usage{
-getFamily(fit)
+getFamily(fit, ...)
 }
 \arguments{
 \item{fit}{a fitted model}

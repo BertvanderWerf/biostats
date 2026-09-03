@@ -16,9 +16,6 @@ getDifferences(
   use_row_names = FALSE
 )
 }
-\arguments{
-\item{use_row_names}{}
-}
 \description{
 getDifferences
 }

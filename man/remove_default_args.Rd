@@ -6,9 +6,6 @@
 \usage{
 remove_default_args(func_name, eval_env = parent.frame())
 }
-\arguments{
-\item{eval_env}{}
-}
 \description{
 remove_default_args
 }

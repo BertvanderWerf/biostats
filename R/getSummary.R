@@ -49,7 +49,7 @@ getSummary <- function(data, maxlevel=5, attr=NULL) {
   }
 
   tab <- ctable(data, names(data),
-                fun=c('class'='Class', 'missing', 'count', total='count','Levels', 'nLevels'),
+                fun=c('class'='Class', 'missing', 'count', total='count', 'nLevels','Levels'),
                 missing_na.rm=FALSE, maxlevel=maxlevel,
                 total_na.rm=FALSE,
                 envir = environment())

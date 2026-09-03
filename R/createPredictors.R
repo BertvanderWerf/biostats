@@ -4,6 +4,7 @@
 #' @param data the dataset to create the predictors from, when omitted getData(object) is used)
 #' @param marginal possible values c('yes','no','minmax','existing') see details section
 #' @param nsteps integer value > 0, indicating the number of steps to use for creating a series of a continuous variable
+#' @param ...
 #'
 #' @details
 #' Additional details...
@@ -14,7 +15,7 @@
 #' @examples
 #' fit <- lm(x ~ Sex*AgeClass, data=data)
 #' newData <- createPredictors(fit, marginal='yes')
-createPredictors <- function(object, data=NULL, marginal=c('yes','no','minmax','existing'), nsteps=1) {
+createPredictors <- function(object, data=NULL, marginal=c('yes','no','minmax','existing'), nsteps=1, ...) {
   marginal <- match.arg(marginal)
   nsteps <- pmax(1, nsteps)
 
@@ -23,10 +24,10 @@ createPredictors <- function(object, data=NULL, marginal=c('yes','no','minmax','
     stopifnot(all(object %in% names(data)))
     Names <- object
   } else if (is.null(data)) {
-    data <- nlme::getData(object)
-    Names <- biostats::getFixedVars(object, data=data)
+    data <- getData(object, ...)
+    Names <- biostats::getFixedVars(object, data=data, ...)
   } else (
-    Names <- biostats::getFixedVars(object, data=data)
+    Names <- biostats::getFixedVars(object, data=data, ...)
   )
   Factor <- sapply(data[,Names], is.factor)
   Text <- sapply(data[,Names], is.character)

@@ -12,9 +12,6 @@ addUpperLower(
   alpha = 0.05
 )
 }
-\arguments{
-\item{variance}{}
-}
 \description{
 addUpperLower
 }

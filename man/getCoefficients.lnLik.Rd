@@ -9,7 +9,7 @@ names(res)\link{names(res)=='coef'} <- 'Estimate'
 res
 }}
 \usage{
-\method{getCoefficients}{lnLik}(fit, vcov = NULL)
+\method{getCoefficients}{lnLik}(fit, vcov = NULL, ...)
 }
 \description{
 #' @export

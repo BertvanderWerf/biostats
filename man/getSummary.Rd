@@ -6,9 +6,6 @@
 \usage{
 getSummary(data, maxlevel = 5, attr = NULL)
 }
-\arguments{
-\item{attr}{}
-}
 \description{
 getSummary
 }

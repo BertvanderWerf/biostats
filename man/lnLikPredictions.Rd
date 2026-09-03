@@ -6,9 +6,6 @@
 \usage{
 lnLikPredictions(pred, fit, fun, nsimulations = 10000, vcov = FALSE)
 }
-\arguments{
-\item{vcov}{}
-}
 \description{
 lnLikPredictions
 }

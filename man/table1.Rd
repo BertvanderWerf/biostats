@@ -6,9 +6,6 @@
 \usage{
 table1(data, rows, cols, name.total = "Total", fun = chisq.test, ...)
 }
-\arguments{
-\item{...}{}
-}
 \description{
 table1
 }

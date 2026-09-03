@@ -6,9 +6,6 @@
 \usage{
 lnLikInitModelParameters(p, models, parnames, weights = NULL)
 }
-\arguments{
-\item{weights}{}
-}
 \description{
 groups parameter values (mean or weighted mean) according to the (sub)models per parameter
 }

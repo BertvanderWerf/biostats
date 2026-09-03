@@ -6,9 +6,6 @@
 \usage{
 getModel(fit, ...)
 }
-\arguments{
-\item{...}{}
-}
 \description{
 getModel
 }
