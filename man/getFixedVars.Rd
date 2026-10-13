@@ -4,7 +4,7 @@
 \alias{getFixedVars}
 \title{getFixedVars}
 \usage{
-getFixedVars(fit, data = NULL)
+getFixedVars(fit, data = NULL, ...)
 }
 \arguments{
 \item{fit}{a fitted model}

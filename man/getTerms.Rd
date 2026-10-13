@@ -4,7 +4,7 @@
 \alias{getTerms}
 \title{getTerms}
 \usage{
-getTerms(fit)
+getTerms(fit, ...)
 }
 \arguments{
 \item{fit}{a fitted model}

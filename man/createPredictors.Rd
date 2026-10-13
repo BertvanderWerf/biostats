@@ -8,7 +8,8 @@ createPredictors(
   object,
   data = NULL,
   marginal = c("yes", "no", "minmax", "existing"),
-  nsteps = 1
+  nsteps = 1,
+  ...
 )
 }
 \arguments{

@@ -6,9 +6,6 @@
 \usage{
 \method{print}{ctable}(crosstable, sep1 = ".", sep2 = ":")
 }
-\arguments{
-\item{sep2}{}
-}
 \description{
 print.ctable
 }

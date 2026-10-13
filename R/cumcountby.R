@@ -17,6 +17,8 @@ cumcountby <- function(data, newvar, da, fact.names) {
   stopifnot(var %in% names(data))
   stopifnot(all(fact.names %in% names(data)))
 
+  classifications <- fact.names
+
   for (c in classifications) {
     data[,c] <- factor(data[,c])
   }

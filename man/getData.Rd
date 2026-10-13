@@ -4,7 +4,7 @@
 \alias{getData}
 \title{getData}
 \usage{
-getData(fit)
+getData(fit, ...)
 }
 \arguments{
 \item{fit}{fitted model}

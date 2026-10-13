@@ -40,6 +40,7 @@ rhs <- function(f) {
 #'
 #' @param fit a fitted model
 #' @param data data used, default NULL, extracted from the model with getData
+#' @param ...
 #'
 #' @return a character string with the variable names in the fixed model
 #' @export
@@ -47,12 +48,12 @@ rhs <- function(f) {
 #' @examples
 #' fit <- lmer(count ~ gender*Age + (1|hospital), data=data)
 #' getFixedVars(fit)
-getFixedVars <- function(fit, data=NULL) {
+getFixedVars <- function(fit, data=NULL, ...) {
   UseMethod("getFixedVars")
 }
 
 #' @export
-getFixedVars.default <- function(fit, data=NULL) {
+getFixedVars.default <- function(fit, data=NULL, ...) {
   # if (is.null(data)) {
   #   data <- getData(fit)
   # }
@@ -66,7 +67,7 @@ getFixedVars.default <- function(fit, data=NULL) {
 }
 
 #' @export
-getFixedVars.lnLik <- function(fit, data=NULL) {
+getFixedVars.lnLik <- function(fit, data=NULL, ...) {
   # if (is.null(data)) {
   #   data <- getData(fit)
   # }
@@ -77,15 +78,25 @@ getFixedVars.lnLik <- function(fit, data=NULL) {
 }
 
 #' @export
-getFixedVars.nls <- function(fit, data=NULL) {
+getFixedVars.nls <- function(fit, data=NULL, ...) {
   formula <- extractFixedFormula(formula(fit))
   names <- all.vars(formula)
   names[!names %in% names(fit$m$getAllPars())]
 }
 
 #' @export
-getFixedVars.gls <- function(fit, data=NULL) { # works also for class gnls
+getFixedVars.gls <- function(fit, data=NULL, ...) { # works also for class gnls
   formula <- extractFixedFormula(formula(fit))
   names <- c(all.vars(formula), names(fit$contrasts))
   names[!names %in% names(fit$plist)]
 }
+
+
+#' @export
+getFixedVars.glmmTMB <- function(fit, data=NULL,  component=c('cond', 'zi', 'disp', 'comb'), ...) {
+  component <- match.arg(component)
+
+  formula <- extractFixedFormula(getFormula(fit, component))
+  all.vars(formula)
+}
+

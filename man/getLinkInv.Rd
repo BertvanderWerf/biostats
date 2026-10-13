@@ -4,7 +4,7 @@
 \alias{getLinkInv}
 \title{getLinkInv}
 \usage{
-getLinkInv(fit)
+getLinkInv(fit, ...)
 }
 \arguments{
 \item{fit}{a fitted model}

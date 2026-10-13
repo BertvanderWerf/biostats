@@ -6,9 +6,6 @@
 \usage{
 set_column_attr(data, col_name, attributes)
 }
-\arguments{
-\item{attributes}{}
-}
 \description{
 set_column_attr
 }

@@ -4,7 +4,7 @@
 \alias{getLink}
 \title{getLink}
 \usage{
-getLink(fit)
+getLink(fit, ...)
 }
 \arguments{
 \item{fit}{a fitted model}

@@ -4,7 +4,7 @@
 \alias{getDf}
 \title{getDf}
 \usage{
-getDf(fit)
+getDf(fit, ...)
 }
 \arguments{
 \item{fit}{a fitted model}

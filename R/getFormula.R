@@ -2,6 +2,7 @@
 #' getFormula
 #'
 #' @param fit fitted model
+#' @param ...
 #'
 #' @return the original dataset used in the regression
 #' @export
@@ -9,17 +10,17 @@
 #' @examples
 #' fit <- lm(y ~ x, data=data)
 #' getData(fit)
-getFormula <- function(fit) {
+getFormula <- function(fit, ...) {
   UseMethod("getFormula")
 }
 
 #' @export
-getFormula.default <- function(fit) {
+getFormula.default <- function(fit, ...) {
   formula(fit)
 }
 
 #' @export
-getFormula.gnls <- function(fit) {
+getFormula.gnls <- function(fit, ...) {
   res <- formula(fit)
 
   c <- fit$call
@@ -41,4 +42,29 @@ getFormula.gnls <- function(fit) {
   parNames <- names(fit$plist)
   attr(res, 'params') <- Params[match(names(Params), parNames)]
   res
+}
+
+#' @export
+getFormula.glmmTMB <- function(fit, component=c('cond', 'zi', 'disp', 'comb'), ...) {
+  component <- match.arg(component)
+
+  if (component == "cond") {
+    condForm <- fit$modelInfo$allForm$formula
+    return(condForm)
+  }
+
+  if (component == "zi") {
+    ziForm <- fit$modelInfo$allForm$ziformula
+    return(ziForm)
+  }
+
+  if (component == "disp") {
+    dispForm <- fit$modelInfo$allForm$dispformula
+    return(dispForm)
+  }
+
+  if (component == "comb") {
+    combForm <- fit$modelInfo$allForm$combForm
+    return(combForm)
+  }
 }

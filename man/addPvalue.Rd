@@ -12,9 +12,6 @@ addPvalue(
   variance = "variance"
 )
 }
-\arguments{
-\item{variance}{}
-}
 \description{
 addPvalue
 }
