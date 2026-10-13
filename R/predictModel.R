@@ -416,7 +416,8 @@ predictModel.glmmTMB <- function(fit, predictors, groupby=NULL, weights=NULL, vc
     stopifnot(weights %nin% groupby)
   }
 
-  formula <- extractFixedFormula(formula(fit, component=component))
+#  formula <- extractFixedFormula(formula(fit, component=component))
+  formula <- extractFixedFormula(getFormula(fit, component=component))
 
   # check if all possible levels of factors (or text) from predictors are in the data used to create the model
   # set extra levels to missing, give warning and remove records from predictors
@@ -511,7 +512,7 @@ predictModel.glmmTMB <- function(fit, predictors, groupby=NULL, weights=NULL, vc
     pred$variance <- setZero(c(sapply(as.data.frame(t(X)), function(y) t(y) %*% vcov[i,i] %*% y)))
   }
 
-  pred <- addUpperLower(pred, getDf(fit))
+  pred <- addUpperLower(pred, getDf(fit, component=component))
 
   names <- c('estimate','variance','lower.95','upper.95')
   if (!(getLink(fit, component=component) %in% c('','identity'))) {
@@ -527,13 +528,13 @@ predictModel.glmmTMB <- function(fit, predictors, groupby=NULL, weights=NULL, vc
   L$link <- getLink(fit, component=component)
   L$linkinv <- getLinkInv(fit, component=component)
   L$family <- getFamily(fit, component=component)
-  L$df <- getDf(fit)
-  L$fixed.vars <- getFixedVars(fit)
+  L$df <- getDf(fit, component=component)
+  L$fixed.vars <- getFixedVars(fit, component=component)
   L$groupby <- groupby
 
   if (!(getLink(fit, component=component) %in% c('','identity'))) {
-    L$estimate <- paste(getLink(fit),'estimate', sep='.')
-    L$variance <- paste(getLink(fit),'variance', sep='.')
+    L$estimate <- paste(getLink(fit, component=component),'estimate', sep='.')
+    L$variance <- paste(getLink(fit, component=component),'variance', sep='.')
   } else {
     L$estimate <- 'estimate'
     L$variance <- 'variance'

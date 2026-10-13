@@ -98,6 +98,7 @@ getCoefficients.glmmTMB <- function(fit, vcov=NULL, component=c('cond', 'zi', 'd
     s <- addUpperLower(s, estimate='Estimate', variance='var')
 
   }
+
   s <- summary(fit)$coefficients
   if (component=='cond' && 'cond' %in% names(s)) {
     s <- as.data.frame(s$cond)

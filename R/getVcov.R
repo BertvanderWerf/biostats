@@ -43,6 +43,5 @@ getVcov.glmmTMB <- function(fit, component=c('cond', 'zi', 'disp', 'comb'), na.r
     cond <- rowSums(is.na(v))==nrow(v)
     v <- v[!cond, !cond, drop=FALSE]
   }
-
-  v
 }
+
