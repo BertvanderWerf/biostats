@@ -408,159 +408,165 @@ predictModel.gnls <- function(fit, predictors, groupby=NULL, weights=NULL, vcov=
 }
 
 #' @export
-predictModel.glmmTMB <- function(fit, predictors, groupby=NULL, weights=NULL, vcov=NULL, vcov.out=TRUE, estimate='Estimate', component=c('cond', 'zi', 'disp'), ...) {
+predictModel.glmmTMB <- function (fit, predictors, groupby = NULL, weights = NULL, vcov = NULL,
+                                  vcov.out = TRUE, estimate = "Estimate", component = c("cond", "zi", "disp"), ...) {
   component <- match.arg(component)
-
-  if (!is.null(groupby) && !is.null(weights)) { # weights is only used if groupby is not null
+  if (!is.null(groupby) && !is.null(weights)) {
     stopifnot(weights %in% names(predictors))
     stopifnot(weights %nin% groupby)
   }
-
-#  formula <- extractFixedFormula(formula(fit, component=component))
-  formula <- extractFixedFormula(getFormula(fit, component=component))
-
-  # check if all possible levels of factors (or text) from predictors are in the data used to create the model
-  # set extra levels to missing, give warning and remove records from predictors
-  vars <- attr(formula, "term.labels")[attr(formula,"order")==1]
-  data <- getData(fit, component=component)[,vars, drop=FALSE]
+  formula <- extractFixedFormula(getFormula(fit, component = component))
+  vars <- attr(formula, "term.labels")[attr(formula, "order") ==
+                                         1]
+  data <- getData(fit, component = component)[, vars, drop = FALSE]
   cond_not_na <- rep(TRUE, nrow(predictors))
   for (var in vars) {
-    if (class(data[,var])!=class(predictors[,var])) {
+    if (class(data[, var]) != class(predictors[, var])) {
       stop("type mismatch for variable ", var, " in getData() and predictors")
     }
-    if (is.factor(data[,var])) {
-      predictors[,var] <- factor(predictors[,var], levels(data[,var]))
-    } else if (is.character(data[,var])) {
-      predictors[predictors[,var] %nin% c(unique(data[,var])),var] <- NA
+    if (is.factor(data[, var])) {
+      predictors[, var] <- factor(predictors[, var], levels(data[,
+                                                                 var]))
     }
-    cond_not_na <- cond_not_na & (!is.na(predictors[,var]))
+    else if (is.character(data[, var])) {
+      predictors[predictors[, var] %nin% c(unique(data[,
+                                                       var])), var] <- NA
+    }
+    cond_not_na <- cond_not_na & (!is.na(predictors[, var]))
   }
-  if (sum(!cond_not_na)>0) {
-    warning('there are missing values in one or more predictor variables, predictors will be reduced by ', sum(!cond_not_na),' records before calculations')
-    predictors <- predictors[cond_not_na,, drop=FALSE]
+  if (sum(!cond_not_na) > 0) {
+    warning("there are missing values in one or more predictor variables, predictors will be reduced by ",
+            sum(!cond_not_na), " records before calculations")
+    predictors <- predictors[cond_not_na, , drop = FALSE]
   }
-
-  pred <- predictors # pred will be modified, predictors are needed
-
+  pred <- predictors
   if (is.null(vcov)) {
-    vcov <- getVcov(fit, component=component)
+    vcov <- getVcov(fit, component = component)
     vcov <- as.matrix(vcov)
   }
-
-  c <- biostats::getCoefficients(fit, vcov=vcov, component=component)
-  x <- model.matrix(formula, data=pred)
-
+  c <- biostats::getCoefficients(fit, vcov = vcov, component = component)
+  x <- model.matrix(formula, data = pred)
   bDebug <- TRUE
   if (!is.null(groupby)) {
     if (is.null(weights)) {
-      weights <- 'Weights'
-      predictors[,weights] <- 1
-      f <- 'sum'
-      names(f) <- paste('total',weights,sep='.')
-      pred <- as.data.frame(ctable(predictors, weights, rows=groupby, fun=f, hsep=c('$','#')))[, -1, drop=FALSE]
-    } else {
-      f <- 'sum'
-      names(f) <- paste('total',weights,sep='.')
-      pred <- as.data.frame(ctable(predictors, weights, rows=groupby, fun=f, hsep=c('$','#')))[, -1, drop=FALSE]
+      weights <- "Weights"
+      predictors[, weights] <- 1
+      f <- "sum"
+      names(f) <- paste("total", weights, sep = ".")
+      pred <- as.data.frame(ctable(predictors, weights,
+                                   rows = groupby, fun = f, hsep = c("$", "#")))[,
+                                                                                 -1, drop = FALSE]
+    }
+    else {
+      f <- "sum"
+      names(f) <- paste("total", weights, sep = ".")
+      pred <- as.data.frame(ctable(predictors, weights,
+                                   rows = groupby, fun = f, hsep = c("$", "#")))[,
+                                                                                 -1, drop = FALSE]
     }
     i <- 1
     for (i in 1:nrow(pred)) {
       cond <- rep(TRUE, nrow(predictors))
       for (j in 1:length(groupby)) {
-        cond <- cond & (predictors[,groupby[j]]==pred[i,groupby[j]])
+        cond <- cond & (predictors[, groupby[j]] == pred[i,
+                                                         groupby[j]])
       }
       if (bDebug) {
-        v1 <- x[cond,,drop=FALSE] # 799 x 32
-        v2 <- predictors[cond,weights]
+        v1 <- x[cond, , drop = FALSE]
+        v2 <- predictors[cond, weights]
         x_i <- v2 %*% v1
-        #x_i <- colSums(x[cond,, drop=FALSE]) #
-        if (i==1) {
+        if (i == 1) {
           X <- x_i/sum(predictors[cond, weights])
-        } else {
+        }
+        else {
           X <- rbind(X, x_i/sum(predictors[cond, weights]))
         }
-      } else {
-        x_i <- colSums(x[cond,, drop=FALSE]) # colSums(x[cond,,drop=FALSE]*predictors[cond,weights])
-        if (i==1) {
-          X <- x_i/sum(cond) # or /sum(weights[cond]) ??? sum(predictors[cond, weights])??
-        } else {
+      }
+      else {
+        x_i <- colSums(x[cond, , drop = FALSE])
+        if (i == 1) {
+          X <- x_i/sum(cond)
+        }
+        else {
           X <- rbind(X, x_i/sum(cond))
         }
       }
     }
     x <- X
   }
-
-  i <- match( row.names(c), colnames(x),nomatch = 0)
-  if (any(i==0)) {
-    stop('the vector for parameter ',row.names(c)[i==0],' is not found in the design matrix')
+  i <- match(row.names(c), colnames(x), nomatch = 0)
+  if (any(i == 0)) {
+    stop("the vector for parameter ", row.names(c)[i == 0],
+         " is not found in the design matrix")
   }
-  X <- x[,i, drop=FALSE]
+  X <- x[, i, drop = FALSE]
   row.names(X) <- NULL
-  stopifnot(all(row.names(c)==colnames(X)))
-
-  pred$estimate <- c(X %*% as.matrix(c[,estimate]))
-
+  stopifnot(all(row.names(c) == colnames(X)))
+  pred$estimate <- c(X %*% as.matrix(c[, estimate]))
   i <- match(row.names(c), colnames(vcov), nomatch = 0)
-  stopifnot(all(i!=0))
-
+  stopifnot(all(i != 0))
   if (vcov.out) {
-    vcov.pred <- X %*% vcov[i,i] %*% t(X)
-    vcov.pred <- setZero((vcov.pred+t(vcov.pred))/2)
-    pred$variance <- diag(vcov.pred)  # [cond]?
-  } else {
-    pred$variance <- setZero(c(sapply(as.data.frame(t(X)), function(y) t(y) %*% vcov[i,i] %*% y)))
+    vcov.pred <- X %*% vcov[i, i] %*% t(X)
+    vcov.pred <- setZero((vcov.pred + t(vcov.pred))/2)
+    pred$variance <- diag(vcov.pred)
+  }  else {
+    pred$variance <- setZero(c(sapply(as.data.frame(t(X)),
+                                      function(y) t(y) %*% vcov[i, i] %*% y)))
   }
-
-  pred <- addUpperLower(pred, getDf(fit, component=component))
-
-  names <- c('estimate','variance','lower.95','upper.95')
-  if (!(getLink(fit, component=component) %in% c('','identity'))) {
-    names(pred) <- replacevalues(names(pred), names, paste(getLink(fit, component=component), names, sep='.'))
+  pred <- addUpperLower(pred, getDf(fit, component = component))
+  names <- c("estimate", "variance", "lower.95", "upper.95")
+  if (!(getLink(fit, component = component) %in% c("", "identity"))) {
+    names(pred) <- replacevalues(names(pred), names, paste(getLink(fit,
+                                                                   component = component), names, sep = "."))
   }
-
   L <- list()
-  L$predictions <-pred
+  L$predictions <- pred
   if (vcov.out) {
     L$vcov <- vcov.pred
   }
   L$X <- x
-  L$link <- getLink(fit, component=component)
-  L$linkinv <- getLinkInv(fit, component=component)
-  L$family <- getFamily(fit, component=component)
-  L$df <- getDf(fit, component=component)
-  L$fixed.vars <- getFixedVars(fit, component=component)
+  L$link <- getLink(fit, component = component)
+  L$linkinv <- getLinkInv(fit, component = component)
+  L$family <- getFamily(fit, component = component)
+  L$df <- getDf(fit, component = component)
+  L$fixed.vars <- getFixedVars(fit, component = component)
   L$groupby <- groupby
-
-  if (!(getLink(fit, component=component) %in% c('','identity'))) {
-    L$estimate <- paste(getLink(fit, component=component),'estimate', sep='.')
-    L$variance <- paste(getLink(fit, component=component),'variance', sep='.')
-  } else {
-    L$estimate <- 'estimate'
-    L$variance <- 'variance'
+  if (!(getLink(fit, component = component) %in% c("", "identity"))) {
+    L$estimate <- paste(getLink(fit, component = component),
+                        "estimate", sep = ".")
+    L$variance <- paste(getLink(fit, component = component),
+                        "variance", sep = ".")
+  }  else {
+    L$estimate <- "estimate"
+    L$variance <- "variance"
   }
-
-  L$predictions <- addPvalue(L$predictions, L$df, estimate=L$estimate, variance=L$variance)
-  if (L$link=='logit') {
-    L$predictions$Odds <- exp(L$predictions[,'logit.estimate'])
-    L$predictions$Odds.lower.95 <- exp(L$predictions[,'logit.lower.95'])
-    L$predictions$Odds.upper.95 <- exp(L$predictions[,'logit.upper.95'])
-
-    inv.logit <- function(x) exp(x)/(1+exp(x))
-    L$predictions$p <- inv.logit(L$predictions[,'logit.estimate'])
-    L$predictions$p.lower.95 <- inv.logit(L$predictions[,'logit.lower.95'])
-    L$predictions$p.upper.95 <- inv.logit(L$predictions[,'logit.upper.95'])
-  } else if (L$link=='log') {
-    L$predictions$estimate <- exp(L$predictions[,'log.estimate'])
-    L$predictions$lower.95 <- exp(L$predictions[,'log.lower.95'])
-    L$predictions$upper.95 <- exp(L$predictions[,'log.upper.95'])
-  } else if (!is.null(L$link) && !(L$link %in% c('identity',''))) {
+  L$predictions <- addPvalue(L$predictions, L$df, estimate = L$estimate,
+                             variance = L$variance)
+  if (L$link == "logit") {
+    L$predictions$Odds <- exp(L$predictions[, "logit.estimate"])
+    L$predictions$Odds.lower.95 <- exp(L$predictions[, "logit.lower.95"])
+    L$predictions$Odds.upper.95 <- exp(L$predictions[, "logit.upper.95"])
+    inv.logit <- function(x) exp(x)/(1 + exp(x))
+    L$predictions$p <- inv.logit(L$predictions[, "logit.estimate"])
+    L$predictions$p.lower.95 <- inv.logit(L$predictions[,
+                                                        "logit.lower.95"])
+    L$predictions$p.upper.95 <- inv.logit(L$predictions[,
+                                                        "logit.upper.95"])
+  } else if (L$link == "log") {
+    L$predictions$estimate <- exp(L$predictions[, "log.estimate"])
+    L$predictions$lower.95 <- exp(L$predictions[, "log.lower.95"])
+    L$predictions$upper.95 <- exp(L$predictions[, "log.upper.95"])
+  }  else if (!is.null(L$link) && !(L$link %in% c("identity",
+                                                  ""))) {
     f <- L$linkinv
-    if (is.character(f)) f <- get(f)
-    L$predictions$estimate <- f(L$predictions[,paste(L$link,'estimate', sep='.')])
-    L$predictions$lower.95 <- f(L$predictions[,paste(L$link,'lower.95', sep='.')])
-    L$predictions$upper.95 <- f(L$predictions[,paste(L$link,'upper.95', sep='.')])
+    if (is.character(f))
+      f <- get(f)
+    L$predictions$estimate <- f(L$predictions[, paste(L$link,
+                                                      "estimate", sep = ".")])
+    L$predictions$lower.95 <- f(L$predictions[, paste(L$link,
+                                                      "lower.95", sep = ".")])
+    L$predictions$upper.95 <- f(L$predictions[, paste(L$link,
+                                                      "upper.95", sep = ".")])
   }
-
   return(L)
 }

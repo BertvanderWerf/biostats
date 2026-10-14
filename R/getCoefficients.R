@@ -93,28 +93,36 @@ getCoefficients.glmmTMB <- function(fit, vcov=NULL, component=c('cond', 'zi', 'd
     if (length(s)<nrow(v)) {
       v <- getVcov(fit, 'comb', na.rm=TRUE)
     }
-    s <-data.frame(parname= row.names(v), Estimate=s, var=diag(v))
+    s <-data.frame(Parname= row.names(v), Estimate=s, var=diag(v),
+                   "Std.Error"=sqrt(diag(v)), 'z value'=s/sqrt(diag(v)))
     s <- addPvalue(s, estimate='Estimate', variance='var')
-    s <- addUpperLower(s, estimate='Estimate', variance='var')
+    names(s)[ncol(s)] <- 'Pr(>|z|)'
 
-  }
-
-  s <- summary(fit)$coefficients
-  if (component=='cond' && 'cond' %in% names(s)) {
-    s <- as.data.frame(s$cond)
-  } else if (component=='zi' && 'zi' %in% names(s)) {
-    s <- as.data.frame(s$zi)
-  } else if (component=='disp' && 'disp' %in% names(s)) {
-    s <- as.data.frame(s$disp)
-  } else {
-    s <- NULL
-  }
-  if (!is.null(s) && isFALSE(full) && any(is.na(s$Estimate))) {
-    s <- s[!is.na(s$Estimate),, drop=FALSE]
-  }
-  if (!is.null(s)) {
-    s <- cbind(Parname=row.names(s), s)
+    s <- cbind(component=sub("[0-9]+$", "", row.names(s)), s)
+    s <- s[,names(s) != 'var']
+    row.names(s) <- s$Parname
     s$sig <- p_to_stars(s[,grepl('^Pr(*)', names(s), fixed=FALSE)])
+
+  } else {
+
+    s <- summary(fit)$coefficients
+    if (component=='cond' && 'cond' %in% names(s)) {
+      s <- as.data.frame(s$cond)
+    } else if (component=='zi' && 'zi' %in% names(s)) {
+      s <- as.data.frame(s$zi)
+    } else if (component=='disp' && 'disp' %in% names(s)) {
+      s <- as.data.frame(s$disp)
+    } else {
+      s <- NULL
+    }
+    if (nrow(s)==0) s <- NULL
+    if (!is.null(s) && isFALSE(full) && any(is.na(s$Estimate))) {
+      s <- s[!is.na(s$Estimate),, drop=FALSE]
+    }
+    if (!is.null(s)) {
+      s <- cbind(Parname=row.names(s), s)
+      s$sig <- p_to_stars(s[,grepl('^Pr(*)', names(s), fixed=FALSE)])
+    }
   }
   s
 }
